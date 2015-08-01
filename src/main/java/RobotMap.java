@@ -7,10 +7,9 @@ import java.util.Random;
 public class RobotMap {
     private static int MAP_SIZE = 5;
     private char[][] map = new char[MAP_SIZE][MAP_SIZE];
-    private static Random RND = new Random();
+    private static Random RND = new Random(System.currentTimeMillis());
     private Pair<Integer,Integer> robotLoc = new Pair(RND.nextInt(MAP_SIZE),RND.nextInt(MAP_SIZE));
     //action key: 0=skip, 1=north, 2=south, 3=east, 4=west, 5=random, 6=pickup
-    private static char[] ACTIONMAP = new char[]{'-','n','s','e','w','r','p'};
     public RobotMap() {
         for(int x=0; x<MAP_SIZE; x++) {
             for(int y=0; y<MAP_SIZE; y++) {
@@ -63,7 +62,7 @@ public class RobotMap {
             //find which scenario we are in
             for (String s : Scenarios.getScenes()) {
                 if (testScenarioCondition(s)) {
-                    System.out.print(getActionChar(strategy[i])+":");
+                    System.out.print(ParamActions.getActionChar(strategy[i])+":");
                     score += performAction(strategy[i]);
                     System.out.println( score);
                     printMap();
@@ -77,21 +76,18 @@ public class RobotMap {
     private void setRobotLoc(int x, int y){
         robotLoc=new Pair(x,y);
     }
-    private static char getActionChar(int action){
-        return ACTIONMAP[action];
-    }
     //0=skip, 1=north, 2=south, 3=east, 4=west, 5=random, 6=trypick
     private int performAction( int action) {
         int x=robotLoc.getKey();
         int y=robotLoc.getValue();
         //for random move, randomize 1-4 inclusive which are the n,s,e,w movements
         if( action == 5){action = RND.nextInt(4)+1;}
-        System.out.print(getActionChar(action) + ":");
+        System.out.print(ParamActions.getActionChar(action) + ":");
         switch(action) {
-            case 1:if(y==0){return -5;}else{setRobotLoc(x,y--);return 0;}
-            case 2:if(y==MAP_SIZE-1){return -5;}else{setRobotLoc(x,y++);return 0;}
-            case 3:if(x==MAP_SIZE-1){return -5;}else{setRobotLoc(x++,y);return 0;}
-            case 4:if(x==0){return -5;}else{setRobotLoc(x--,y);return 0;}
+            case 1:if(y==0){return -5;}else{setRobotLoc(x,--y);return 0;}
+            case 2:if(y==MAP_SIZE-1){return -5;}else{setRobotLoc(x,++y);return 0;}
+            case 3:if(x==MAP_SIZE-1){return -5;}else{setRobotLoc(++x,y);return 0;}
+            case 4:if(x==0){return -5;}else{setRobotLoc(--x,y);return 0;}
             case 6:if(map[x][y]=='c'){map[x][y]='.';return 10;}else{return -1;}
             default: return 0;
         }
@@ -99,10 +95,10 @@ public class RobotMap {
     public static void main(String[] args) {
         RobotMap rm = new RobotMap();
         rm.printMap();
-        int[] strategy = new int[243];
+        int[] strategy = new int[Scenarios.getNumberOfScenes()];
         //int[] strategy = new int[19683];
         for(int i=0; i<strategy.length; i++) {
-            strategy[i] = RND.nextInt(7);
+            strategy[i] = RND.nextInt(ParamActions.getNumberOfActions());
         }
 
         System.out.println("score: "+rm.scoreStrategy(strategy,50));

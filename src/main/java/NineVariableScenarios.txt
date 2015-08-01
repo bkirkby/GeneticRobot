@@ -1,5 +1,6 @@
 //generated for 9 vars: w,e,n,s,c,nw,sw,ne,se
 //of three possible values: .,c,w
+//there are 3^9=19,683 different scenarios here
 ".c.cwww.w", "...cccc.w", "w.wccw..c", "c.c..c.cc", "wwc.c...w", "cw.wwwwww", ".....w.wc", "cw.wwwwwc", ".c.cwww.c", "w..ccwcwc",
 "...cccc.c", "wccw.wc.c", "wcwww.c.w", "c.wc.c.wc", ".w.cccww.", "..c..ccw.", "c.c..c.cw", "cwccc.wcc", "wc.w..c..", "wwcw..w.w",
 "cwccc.wc.", "cwww.cw.w", "wcw.ccccc", "w.cc...ww", "wwcw..w.c", "cwww.cw.c", "cccccwcc.", ".ccc.c.w.", "c..cwww..", "c.wc.c.ww",
