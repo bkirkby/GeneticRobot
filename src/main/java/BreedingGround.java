@@ -1,15 +1,22 @@
+import java.util.ArrayDeque;
 import java.util.LinkedList;
 import java.util.Random;
 
 public class BreedingGround {
     //it's ordered from top to bottom
 
-    private static double MUTATION_RATE=0.05;
+    private static double MUTATION_RATE=0.005;
     private LinkedList<int[]> breederPop = new LinkedList<>();
-    int p1Idx=0,p2Idx=1;
+    int p1Idx=0;
+    ArrayDeque<Integer> indexesOfP2s = new ArrayDeque<>();
     private static Random RND = new Random(System.currentTimeMillis());
 
     public void addBreeder(int[] breeder) {
+        if( breederPop.isEmpty()) {
+            p1Idx=0;
+        } else {
+            indexesOfP2s.push(breederPop.size());
+        }
         breederPop.add( breeder);
     }
 
@@ -27,18 +34,20 @@ public class BreedingGround {
     }
 
     private void advancePartners() {
-        if(++p2Idx == breederPop.size()) {//check if we go past the end
-            p2Idx = 0;
-        }
-        if( p2Idx == p1Idx) {//check if we are going to breed with self
-            if(++p1Idx == breederPop.size()) {
-                p1Idx = 0;
+        if( indexesOfP2s.isEmpty()) {
+            if(++p1Idx >= breederPop.size()){
+                p1Idx=0;
+            }
+            for(int i=0; i<breederPop.size(); i++) {
+                if( i != p1Idx) {
+                    indexesOfP2s.push(i);
+                }
             }
         }
     }
 
     public int[] getNextOfBrood() {
-        int [] ret = crossBreedAndMutate( breederPop.get(p1Idx), breederPop.get(p2Idx));
+        int [] ret = crossBreedAndMutate( breederPop.get(p1Idx), breederPop.get(indexesOfP2s.pop()));
         advancePartners();
         return ret;
     }

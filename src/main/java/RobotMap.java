@@ -5,15 +5,16 @@ import java.util.Map;
 import java.util.Random;
 
 public class RobotMap {
-    private static int MAP_SIZE = 5;
+    private static int MAP_SIZE = 12;
     private char[][] map = new char[MAP_SIZE][MAP_SIZE];
     private static Random RND = new Random(System.currentTimeMillis());
     private Pair<Integer,Integer> robotLoc = new Pair(RND.nextInt(MAP_SIZE),RND.nextInt(MAP_SIZE));
+    private double CAN_POP_FACTOR = .5;
     //action key: 0=skip, 1=north, 2=south, 3=east, 4=west, 5=random, 6=pickup
     public RobotMap() {
         for(int x=0; x<MAP_SIZE; x++) {
             for(int y=0; y<MAP_SIZE; y++) {
-                if(RND.nextFloat()>.5) {
+                if(RND.nextDouble()>CAN_POP_FACTOR) {
                     map[x][y] = 'c';
                 } else {
                     map[x][y] = '.';
@@ -31,45 +32,26 @@ public class RobotMap {
             System.out.println( row.toString());
         }
     }
-    //s is an index of condition values at the location. s[0]=west, s[1]=east, s[2]=north, s[3]=south, s[4]=current
-    private boolean testScenarioCondition(String s) {
-        int x = robotLoc.getKey();
-        int y = robotLoc.getValue();
-        //the following conditionals && statements check the following:
-        //   *  s.charAt(i)=='w'&&x|y==0|MAP_SIZE-1 : check to see if we are supposed to see a wall on the edge. if so and we are on the edge, then it passes
-        //   *  x|y!=MAP_SIZE-1|0 : a boundary check for looking inside the map array
-        //   *  map[x[+|-]1][y[+|-]1]==s.charAt(i) : see if this matches the conditional check for that specific location. if all of these are true, then we have our condition is true
-        if( ((s.charAt(0)=='w'&&x==0) || (x!=0 && map[x-1][y]==s.charAt(0))) //west
-                && ((s.charAt(1)=='w'&&x==MAP_SIZE-1) || (x!=MAP_SIZE-1 && map[x+1][y]==s.charAt(1))) //east
-                && ((s.charAt(2)=='w'&&y==0) || (y!=0 && map[x][y-1]==s.charAt(2))) //north
-                && ((s.charAt(3)=='w'&&y==MAP_SIZE-1) || (y!=MAP_SIZE-1 && map[x][y+1]==s.charAt(3))) //south
-                && map[x][y]==s.charAt(4) //current
-/*                && ((s.charAt(5)=='w'&&(x==0||y==0)) || (y!=0 && x!=0 && map[x-1][y-1]==s.charAt(5))) //nw
-                && ((s.charAt(6)=='w'&&(x==0||y==MAP_SIZE-1)) || (y!=MAP_SIZE-1 && x!=0 && map[x-1][y+1]==s.charAt(6))) //sw
-                && ((s.charAt(7)=='w'&&(x==MAP_SIZE-1||y==0)) || (y!=0 && x!=MAP_SIZE-1 && map[x+1][y-1]==s.charAt(7))) //ne
-                && ((s.charAt(8)=='w'&&(x==MAP_SIZE-1||y==MAP_SIZE-1)) || (y!=MAP_SIZE-1 && x!=MAP_SIZE-1 && map[x+1][y+1]==s.charAt(8))) //se*/
-                ){
-//            System.out.print(s+":");
-            return true;
-        }
-        return false;
+    private String getCurrentScene() {
+        String ret = "";
+        int x=robotLoc.getKey();
+        int y=robotLoc.getValue();
+        //west
+        ret += (x==0?'w':map[x-1][y]);
+        //east
+        ret += (x==MAP_SIZE-1?'w':map[x+1][y]);
+        //north
+        ret += (y==0?'w':map[x][y-1]);
+        //south
+        ret += (y==MAP_SIZE-1?'w':map[x][y+1]);
+        //current
+        ret += map[x][y];
+        return ret;
     }
     public int scoreStrategy( int[] strategy, int maxSteps) {
         int score = 0;
-        for( int j=0;j<maxSteps;j++) {
-            int i = 0;
-//            System.out.print(""+robotLoc.getKey()+","+robotLoc.getValue()+":");
-            //find which scenario we are in
-            for (String s : Scenarios.getScenes()) {
-                if (testScenarioCondition(s)) {
-//                    System.out.print(ParamActions.getActionChar(strategy[i])+":");
-                    score += performAction(strategy[i]);
-//                    System.out.println( score);
-//                    printMap();
-                    break;
-                }
-                i++;
-            }
+        for( int i=0;i<maxSteps;i++) {
+            score += performAction(strategy[Scenarios.getSceneIdx(getCurrentScene())]);
         }
         return score;
     }
@@ -92,7 +74,7 @@ public class RobotMap {
             default: return 0;
         }
     }
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         RobotMap rm = new RobotMap();
         rm.printMap();
         int[] strategy = new int[Scenarios.getNumberOfScenes()];
@@ -101,6 +83,6 @@ public class RobotMap {
             strategy[i] = RND.nextInt(ParamActions.getNumberOfActions());
         }
 
-//        System.out.println("score: "+rm.scoreStrategy(strategy,50));
-    }
+        System.out.println("score: "+rm.scoreStrategy(strategy,50));
+    }*/
 }
