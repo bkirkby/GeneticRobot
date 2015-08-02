@@ -49,7 +49,7 @@ public class RobotMap {
                 && ((s.charAt(7)=='w'&&(x==MAP_SIZE-1||y==0)) || (y!=0 && x!=MAP_SIZE-1 && map[x+1][y-1]==s.charAt(7))) //ne
                 && ((s.charAt(8)=='w'&&(x==MAP_SIZE-1||y==MAP_SIZE-1)) || (y!=MAP_SIZE-1 && x!=MAP_SIZE-1 && map[x+1][y+1]==s.charAt(8))) //se*/
                 ){
-            System.out.print(s+":");
+//            System.out.print(s+":");
             return true;
         }
         return false;
@@ -58,14 +58,14 @@ public class RobotMap {
         int score = 0;
         for( int j=0;j<maxSteps;j++) {
             int i = 0;
-            System.out.print(""+robotLoc.getKey()+","+robotLoc.getValue()+":");
+//            System.out.print(""+robotLoc.getKey()+","+robotLoc.getValue()+":");
             //find which scenario we are in
             for (String s : Scenarios.getScenes()) {
                 if (testScenarioCondition(s)) {
-                    System.out.print(ParamActions.getActionChar(strategy[i])+":");
+//                    System.out.print(ParamActions.getActionChar(strategy[i])+":");
                     score += performAction(strategy[i]);
-                    System.out.println( score);
-                    printMap();
+//                    System.out.println( score);
+//                    printMap();
                     break;
                 }
                 i++;
@@ -82,7 +82,7 @@ public class RobotMap {
         int y=robotLoc.getValue();
         //for random move, randomize 1-4 inclusive which are the n,s,e,w movements
         if( action == 5){action = RND.nextInt(4)+1;}
-        System.out.print(ParamActions.getActionChar(action) + ":");
+//        System.out.print(ParamActions.getActionChar(action) + ":");
         switch(action) {
             case 1:if(y==0){return -5;}else{setRobotLoc(x,--y);return 0;}
             case 2:if(y==MAP_SIZE-1){return -5;}else{setRobotLoc(x,++y);return 0;}
@@ -101,6 +101,6 @@ public class RobotMap {
             strategy[i] = RND.nextInt(ParamActions.getNumberOfActions());
         }
 
-        System.out.println("score: "+rm.scoreStrategy(strategy,50));
+//        System.out.println("score: "+rm.scoreStrategy(strategy,50));
     }
 }
