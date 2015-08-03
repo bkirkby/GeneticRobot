@@ -15,6 +15,9 @@ public class GeneticCode implements Runnable {
 
     private Vector<NewGenerationScoredListener> newGenerationListeners = new Vector<>();
 
+    private boolean paused = false;
+    private boolean stopped = false;
+
     public GeneticCode( int maxGenerations) {
         this.maxGenerations=maxGenerations;
         initPopulation();
@@ -101,8 +104,16 @@ public class GeneticCode implements Runnable {
         }
     }
     public void run() {
-        for(int i=0; i<this.maxGenerations; i++) {
-            generationNext();
+        for(int i=0; i<this.maxGenerations && stopped==false; i++) {
+            if(!paused) {
+                generationNext();
+            } else {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    return;
+                }
+            }
         }
     }
     private void fireNewGenerationScoredEvent( int generationNumber, Strategy generation) {
@@ -114,18 +125,26 @@ public class GeneticCode implements Runnable {
         newGenerationListeners.add( listener);
     }
 
+    public void pauseGeneration() {
+        paused = true;
+    }
+    public void contGeneration() {
+        paused = false;
+    }
+    public void stopGeneration() {
+        stopped = true;
+    }
+
     static public void main( String[] args) {
         GeneticCode gc = new GeneticCode(1000);
         gc.addNewGenerationScoredListener(new NewGenerationScoredListener() {
             @Override
             public void newGenerationScored(int generationNumber, Strategy strategy) {
-                System.out.println(generationNumber+"    "+strategy.getScore());
+                System.out.println(generationNumber + "    " + strategy.getScore());
             }
         });
 
         (new Thread(gc)).start();
-
-
 
         int [] bestStrat = gc.getLatestGeneration().getStrategy();
         for(int i=0; i<bestStrat.length; i++) {
