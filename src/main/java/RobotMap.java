@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Random;
 
 public class RobotMap {
-    private static int MAP_SIZE = 12;
+    private static int MAP_SIZE = 10;
     private char[][] map = new char[MAP_SIZE][MAP_SIZE];
     private static Random RND = new Random(System.currentTimeMillis());
     private Pair<Integer,Integer> robotLoc = new Pair(RND.nextInt(MAP_SIZE),RND.nextInt(MAP_SIZE));
@@ -64,7 +64,6 @@ public class RobotMap {
         int y=robotLoc.getValue();
         //for random move, randomize 1-4 inclusive which are the n,s,e,w movements
         if( action == 5){action = RND.nextInt(4)+1;}
-//        System.out.print(ParamActions.getActionChar(action) + ":");
         switch(action) {
             case 1:if(y==0){return -5;}else{setRobotLoc(x,--y);return 0;}
             case 2:if(y==MAP_SIZE-1){return -5;}else{setRobotLoc(x,++y);return 0;}

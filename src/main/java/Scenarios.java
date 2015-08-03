@@ -86,16 +86,17 @@ public class Scenarios {
     static public int getSceneIdx(String s) {
         return SCENES.get(s);
     }
-    /*static public void main(String[] args) {
+    static public void main(String[] args) {
         Iterable<String> sc = genNewScenes("...cw");
         int count=0;
         for( String s : sc) {
             System.out.print("put(\"" + s + "\","+count+"); ");
-            if( count++%7 == 9) {
+            if( (count !=0) && (count%7 == 0)) {
                 System.out.println();
             }
+            count++;
         }
         System.out.println();
         System.out.println("total: "+count);
-    }*/
+    }
 }
