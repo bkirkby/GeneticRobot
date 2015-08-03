@@ -10,6 +10,8 @@ public class RobotMap {
     private static Random RND = new Random(System.currentTimeMillis());
     private Pair<Integer,Integer> robotLoc = new Pair(RND.nextInt(MAP_SIZE),RND.nextInt(MAP_SIZE));
     private double CAN_POP_FACTOR = .5;
+    private int[] robotStrategy;
+
     //action key: 0=skip, 1=north, 2=south, 3=east, 4=west, 5=random, 6=pickup
     public RobotMap() {
         for(int x=0; x<MAP_SIZE; x++) {
@@ -48,10 +50,23 @@ public class RobotMap {
         ret += map[x][y];
         return ret;
     }
-    public int scoreStrategy( int[] strategy, int maxSteps) {
+    //returns the score from the action
+    public int stepStrategy() {
+        if( robotStrategy == null) {
+            return 0;
+        }
+        return performAction(robotStrategy[Scenarios.getSceneIdx(getCurrentScene())]);
+    }
+    public void setRobotStrategy( int[] strategy) {
+        this.robotStrategy = strategy;
+    }
+    public int scoreStrategy( int maxSteps) {
+        if( robotStrategy == null) {
+            return 0;
+        }
         int score = 0;
         for( int i=0;i<maxSteps;i++) {
-            score += performAction(strategy[Scenarios.getSceneIdx(getCurrentScene())]);
+            score += stepStrategy();
         }
         return score;
     }

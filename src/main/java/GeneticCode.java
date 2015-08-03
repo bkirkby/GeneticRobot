@@ -1,8 +1,10 @@
+import javafx.concurrent.Task;
+
 import java.util.*;
 
-public class GeneticCode implements Runnable {
+public class GeneticCode extends Task implements Runnable {
     private static int NUM_ITRS_ON_MAP =200;
-    private static int NUM_MAPS_TO_TEST =200;
+    private static int NUM_MAPS_TO_TEST =50;
     private static double ELITE_POPULATION=0.05;
     private static double BREEDING_POPULATION_FACTOR =.25;
     private static int POP_SIZE =200;
@@ -36,7 +38,8 @@ public class GeneticCode implements Runnable {
         double ret = 0;
 
         for( RobotMap rm : testRobotMaps) {
-            ret += rm.scoreStrategy( strategy, NUM_ITRS_ON_MAP);
+            rm.setRobotStrategy(strategy);
+            ret += rm.scoreStrategy( NUM_ITRS_ON_MAP);
         }
         return ret/testRobotMaps.size();
     }
@@ -103,6 +106,13 @@ public class GeneticCode implements Runnable {
             return s.score<this.score?-1:1;
         }
     }
+
+    @Override
+    protected Object call() throws Exception {
+        run();
+        return null;
+    }
+
     public void run() {
         for(int i=0; i<this.maxGenerations && stopped==false; i++) {
             if(!paused) {

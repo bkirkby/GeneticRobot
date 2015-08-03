@@ -1,4 +1,6 @@
 import javafx.application.Application;
+import javafx.concurrent.Task;
+import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -9,6 +11,7 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -22,10 +25,13 @@ public class MainApplication extends Application implements NewGenerationScoredL
     private XYChart.Series series = new XYChart.Series();
     private static int NUM_GENERATIONS = 1000;
     private Thread geneticCodeThread;
+    TextArea generationTA = new TextArea();
 
     @Override
     public void newGenerationScored(int generationNumber, Strategy strat) {
+        //TODO: concurrent modification probs: http://docs.oracle.com/javafx/2/api/javafx/concurrent/Task.html
         series.getData().add(new XYChart.Data(generationNumber, strat.getScore()));
+        generationTA.setText(generationNumber + "    " + strat.getScore()+"\n"+generationTA.getText());
     }
 
     @Override
@@ -44,11 +50,11 @@ public class MainApplication extends Application implements NewGenerationScoredL
         lineChart.setTitle("robot strategy performance by generation");
         //defining a series
         //XYChart.Series series = new XYChart.Series();
-        series.setName("generation x performance");
+        series.setName("genetic brood");
 
         VBox vbox = new VBox();
 
-        Scene scene = new Scene( new Group(), 800, 600);
+        Scene scene = new Scene( new Group(), 700, 600);
         scene.getStylesheets().add("MainApplication.css");
         lineChart.getData().add(series);
 
@@ -68,8 +74,8 @@ public class MainApplication extends Application implements NewGenerationScoredL
                         start.setText("pause");
                     } else if (start.getText() == "pause") {
                         gc.pauseGeneration();
-                        start.setText("cont");
-                    } else if (start.getText() == "cont") {
+                        start.setText("continue");
+                    } else if (start.getText() == "continue") {
                         gc.contGeneration();
                         start.setText("pause");
                     }
@@ -79,7 +85,25 @@ public class MainApplication extends Application implements NewGenerationScoredL
             hbox.setSpacing(10);
             hbox.getChildren().addAll(start);
             hbox.setPadding(new Insets(10, 10, 10, 50));
-            reproductionVbox.getChildren().addAll(hbox, lineChart);
+            generationTA.setPrefRowCount(4);
+            generationTA.setPadding(new Insets(0, 5, 0, 5));
+            generationTA.setStyle(
+                    "-fx-text-fill: #00ff00;" +
+                            "-fx-font-family: Verdana;" +
+                            "-fx-font-size: 10;" +
+                            "-fx-font-weight: bold;"
+            );
+            generationTA.setPrefWidth(150);
+            generationTA.setMaxWidth(150);
+            generationTA.setPrefHeight(450);
+
+            HBox h = new HBox();
+            h.getChildren().addAll(lineChart, generationTA);
+            h.setPrefHeight(450);
+            h.setPrefWidth(800);
+
+            //reproductionVbox.getChildren().addAll(hbox, lineChart, generationTA);
+            reproductionVbox.getChildren().addAll(hbox, h);
             Tab genTab = new Tab();
             genTab.setText("reproduce");
             genTab.setContent(reproductionVbox);
@@ -122,14 +146,22 @@ public class MainApplication extends Application implements NewGenerationScoredL
 
         stage.setScene(scene);
         stage.show();
+
+        //this has to be here cause it's a hac to get the background color of the textarea changed
+        Region reg = (Region)generationTA.lookup(".content");
+        reg.setStyle("-fx-background-color: black;");
     }
-
-
 
     public void startReproducing() {
         //setup the robot code
         gc = new GeneticCode(NUM_GENERATIONS);
         gc.addNewGenerationScoredListener( this);
+        gc.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
+            @Overrid //todo: concurrency issues
+            public void handle(WorkerStateEvent event) {
+
+            }
+        });
         geneticCodeThread = new Thread(gc);
         geneticCodeThread.start();
     }
