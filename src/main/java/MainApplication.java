@@ -1,5 +1,4 @@
 import javafx.application.Application;
-import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -21,18 +20,13 @@ import javafx.stage.WindowEvent;
  * Created by kirkby on 8/2/15.
  */
 public class MainApplication extends Application implements NewGenerationScoredListener {
-    private GeneticCode gc;
+    private GeneticPopulation gc;
     private XYChart.Series series = new XYChart.Series();
-    private static int NUM_GENERATIONS = 1000;
-    private Thread geneticCodeThread;
+    //private static int NUM_GENERATIONS = GeneticRobotProperties.getNumberOfGenerations();
     TextArea generationTA = new TextArea();
-
-    @Override
-    public void newGenerationScored(int generationNumber, Strategy strat) {
-        //TODO: concurrent modification probs: http://docs.oracle.com/javafx/2/api/javafx/concurrent/Task.html
-        series.getData().add(new XYChart.Data(generationNumber, strat.getScore()));
-        generationTA.setText(generationNumber + "    " + strat.getScore()+"\n"+generationTA.getText());
-    }
+    private boolean paused = false;
+    private boolean stopped = false;
+    private Button startButton;
 
     @Override
     public void start(Stage stage) throws Exception {
@@ -49,7 +43,6 @@ public class MainApplication extends Application implements NewGenerationScoredL
 
         lineChart.setTitle("robot strategy performance by generation");
         //defining a series
-        //XYChart.Series series = new XYChart.Series();
         series.setName("genetic brood");
 
         VBox vbox = new VBox();
@@ -73,26 +66,21 @@ public class MainApplication extends Application implements NewGenerationScoredL
                         startReproducing();
                         start.setText("pause");
                     } else if (start.getText() == "pause") {
-                        gc.pauseGeneration();
+                        pauseGeneration();
                         start.setText("continue");
                     } else if (start.getText() == "continue") {
-                        gc.contGeneration();
+                        contGeneration();
                         start.setText("pause");
                     }
                 }
             });
+            startButton=start;
             HBox hbox = new HBox();
             hbox.setSpacing(10);
             hbox.getChildren().addAll(start);
             hbox.setPadding(new Insets(10, 10, 10, 50));
             generationTA.setPrefRowCount(4);
-            generationTA.setPadding(new Insets(0, 5, 0, 5));
-            generationTA.setStyle(
-                    "-fx-text-fill: #00ff00;" +
-                            "-fx-font-family: Verdana;" +
-                            "-fx-font-size: 10;" +
-                            "-fx-font-weight: bold;"
-            );
+            generationTA.setPadding(new Insets(0, 3, 0, 3));
             generationTA.setPrefWidth(150);
             generationTA.setMaxWidth(150);
             generationTA.setPrefHeight(450);
@@ -102,7 +90,6 @@ public class MainApplication extends Application implements NewGenerationScoredL
             h.setPrefHeight(450);
             h.setPrefWidth(800);
 
-            //reproductionVbox.getChildren().addAll(hbox, lineChart, generationTA);
             reproductionVbox.getChildren().addAll(hbox, h);
             Tab genTab = new Tab();
             genTab.setText("reproduce");
@@ -138,9 +125,7 @@ public class MainApplication extends Application implements NewGenerationScoredL
         stage.setOnCloseRequest( new EventHandler<WindowEvent>(){
             @Override
             public void handle(WindowEvent event) {
-                if( gc!= null) {
-                    gc.stopGeneration();
-                }
+                stopGeneration();
             }
         });
 
@@ -152,18 +137,46 @@ public class MainApplication extends Application implements NewGenerationScoredL
         reg.setStyle("-fx-background-color: black;");
     }
 
+    @Override
+    public void newGenerationScored() {
+        if( gc.getLatestGenerationNumber() < GeneticRobotProperties.getNumberOfGenerations() && !stopped && !paused) {
+            gc.genNextGeneration();
+        }
+        if( gc.getLatestGenerationNumber() >= GeneticRobotProperties.getNumberOfGenerations()) {
+            startButton.setText("start");
+        }
+    }
+
     public void startReproducing() {
         //setup the robot code
-        gc = new GeneticCode(NUM_GENERATIONS);
-        gc.addNewGenerationScoredListener( this);
-        gc.setOnSucceeded(new EventHandler<WorkerStateEvent>() {
-            @Overrid //todo: concurrency issues
-            public void handle(WorkerStateEvent event) {
+        gc = new GeneticPopulation();
+        gc.addNewGenerationScoredListener(this);
+        gc.setGenerationCompleteEventHandler(new GenerationCompleteEventHandler());
 
-            }
-        });
-        geneticCodeThread = new Thread(gc);
-        geneticCodeThread.start();
+        series.getData().clear();
+
+        gc.genNextGeneration();
+    }
+    public void pauseGeneration() {
+        paused = true;
+    }
+    public void contGeneration() {
+        paused = false;
+        gc.genNextGeneration();
+    }
+    public void stopGeneration() {
+        stopped = true;
+    }
+
+    private class GenerationCompleteEventHandler implements EventHandler<WorkerStateEvent> {
+        @Override
+        public void handle(WorkerStateEvent event) {
+            Strategy s = gc.getLatestGeneration();
+            int genNum = gc.getLatestGenerationNumber();
+
+            series.getData().add(new XYChart.Data(genNum, s.getScore()));
+            generationTA.setText(genNum + "    " + s.getScore()+"\n"+generationTA.getText());
+        }
     }
 
     public static void main(String[] args) {

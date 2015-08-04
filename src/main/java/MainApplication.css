@@ -1,8 +1,43 @@
 .default-color0.chart-line-symbol {
-  -fx-background-color: #00ff00, white;
+  -fx-background-color: #00ff00, #00ff00;
 }
 
 .default-color0.chart-series-line {
    -fx-stroke: #00ff00;
    -fx-stroke-width: 2px;
 }
+
+.chart-plot-background {
+  -fx-background-color: #bfbfbf;
+}
+
+.text-area {
+  -fx-text-fill: #00ff00;
+  -fx-font-family: Verdana;
+  -fx-font-size: 10;
+  -fx-font-weight: bold;
+  -fx-background-color: #b9b9b9;
+}
+
+.text-area .content {
+  -fx-background-color: #bfbfbf;
+}
+
+/*.chart-content {
+  -fx-background-color: black;
+}
+
+.chart-title {
+  -fx-text-fill: #4682b4;
+  -fx-font-size: 1.6em;
+}
+
+.axis-label {
+  -fx-text-fill: #4682b4;
+}*/
+
+/* http://docs.oracle.com/javase/8/javafx/user-interface-tutorial/css-styles.htm#CIHGIAGE */
+/*.chart-line {
+  border-style: solid;
+  border: 1px 1px 1px 1px;
+}*/

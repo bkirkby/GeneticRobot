@@ -5,18 +5,18 @@ import java.util.Map;
 import java.util.Random;
 
 public class RobotMap {
-    private static int MAP_SIZE = 10;
-    private char[][] map = new char[MAP_SIZE][MAP_SIZE];
+    private char[][] map;
     private static Random RND = new Random(System.currentTimeMillis());
-    private Pair<Integer,Integer> robotLoc = new Pair(RND.nextInt(MAP_SIZE),RND.nextInt(MAP_SIZE));
-    private double CAN_POP_FACTOR = .5;
+    private Pair<Integer,Integer> robotLoc;
     private int[] robotStrategy;
 
     //action key: 0=skip, 1=north, 2=south, 3=east, 4=west, 5=random, 6=pickup
     public RobotMap() {
-        for(int x=0; x<MAP_SIZE; x++) {
-            for(int y=0; y<MAP_SIZE; y++) {
-                if(RND.nextDouble()>CAN_POP_FACTOR) {
+        robotLoc = new Pair(RND.nextInt(GeneticRobotProperties.getMapSize()),RND.nextInt(GeneticRobotProperties.getMapSize()));
+        map = new char[GeneticRobotProperties.getMapSize()][GeneticRobotProperties.getMapSize()];
+        for(int x=0; x<GeneticRobotProperties.getMapSize(); x++) {
+            for(int y=0; y<GeneticRobotProperties.getMapSize(); y++) {
+                if(RND.nextDouble()>GeneticRobotProperties.getCanDisperseFactor()) {
                     map[x][y] = 'c';
                 } else {
                     map[x][y] = '.';
@@ -25,9 +25,9 @@ public class RobotMap {
         }
     }
     public void printMap() {
-        for(int y=0; y<MAP_SIZE; y++) {
+        for(int y=0; y<GeneticRobotProperties.getMapSize(); y++) {
             StringBuffer row = new StringBuffer();
-            for(int x=0; x<MAP_SIZE; x++) {
+            for(int x=0; x<GeneticRobotProperties.getMapSize(); x++) {
                 row.append(this.map[x][y]);
                 row.append(' ');
             }
@@ -41,11 +41,11 @@ public class RobotMap {
         //west
         ret += (x==0?'w':map[x-1][y]);
         //east
-        ret += (x==MAP_SIZE-1?'w':map[x+1][y]);
+        ret += (x==GeneticRobotProperties.getMapSize()-1?'w':map[x+1][y]);
         //north
         ret += (y==0?'w':map[x][y-1]);
         //south
-        ret += (y==MAP_SIZE-1?'w':map[x][y+1]);
+        ret += (y==GeneticRobotProperties.getMapSize()-1?'w':map[x][y+1]);
         //current
         ret += map[x][y];
         return ret;
@@ -81,8 +81,8 @@ public class RobotMap {
         if( action == 5){action = RND.nextInt(4)+1;}
         switch(action) {
             case 1:if(y==0){return -5;}else{setRobotLoc(x,--y);return 0;}
-            case 2:if(y==MAP_SIZE-1){return -5;}else{setRobotLoc(x,++y);return 0;}
-            case 3:if(x==MAP_SIZE-1){return -5;}else{setRobotLoc(++x,y);return 0;}
+            case 2:if(y==GeneticRobotProperties.getMapSize()-1){return -5;}else{setRobotLoc(x,++y);return 0;}
+            case 3:if(x==GeneticRobotProperties.getMapSize()-1){return -5;}else{setRobotLoc(++x,y);return 0;}
             case 4:if(x==0){return -5;}else{setRobotLoc(--x,y);return 0;}
             case 6:if(map[x][y]=='c'){map[x][y]='.';return 10;}else{return -1;}
             default: return 0;
