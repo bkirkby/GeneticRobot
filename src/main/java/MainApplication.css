@@ -23,6 +23,13 @@
   -fx-background-color: #bfbfbf;
 }
 
+.properties-element {
+  -fx-padding: 2 2 2 2;
+  -fx-font-family: Consolas;
+  -fx-font-size: 10;
+  -fx-font-weight: bold;
+}
+
 /*.chart-content {
   -fx-background-color: black;
 }

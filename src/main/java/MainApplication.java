@@ -26,10 +26,11 @@ public class MainApplication extends Application implements NewGenerationScoredL
     TextArea generationTA = new TextArea();
     private boolean paused = false;
     private boolean stopped = false;
-    private Button startButton;
+    final private Button startButtonReproduction = new Button("start");
+    final private Button propsButtonReproduction = new Button("properties");
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(final Stage stage) throws Exception {
         stage.setTitle("robot strategy performance by generation");
         //defining the axes
         final NumberAxis xAxis = new NumberAxis();
@@ -58,26 +59,39 @@ public class MainApplication extends Application implements NewGenerationScoredL
         //setup the reproduction tab
         {
             VBox reproductionVbox = new VBox();
-            final Button start = new Button("start");
-            start.setOnAction(new EventHandler<ActionEvent>() {
+            startButtonReproduction.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent event) {
-                    if (start.getText() == "start") {
+                    if (startButtonReproduction.getText() == "start") {
+                        propsButtonReproduction.setDisable(true);
+                        generationTA.setText("initializing...\n" + generationTA.getText());
                         startReproducing();
-                        start.setText("pause");
-                    } else if (start.getText() == "pause") {
+                        startButtonReproduction.setText("pause");
+                    } else if (startButtonReproduction.getText() == "pause") {
                         pauseGeneration();
-                        start.setText("continue");
-                    } else if (start.getText() == "continue") {
+                        startButtonReproduction.setText("continue");
+                    } else if (startButtonReproduction.getText() == "continue") {
                         contGeneration();
-                        start.setText("pause");
+                        startButtonReproduction.setText("pause");
                     }
                 }
             });
-            startButton=start;
+
+            propsButtonReproduction.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+                    PropertiesDialog pd = new PropertiesDialog();
+                    try {
+                        pd.start(stage);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            });
             HBox hbox = new HBox();
             hbox.setSpacing(10);
-            hbox.getChildren().addAll(start);
+            hbox.getChildren().addAll(startButtonReproduction, propsButtonReproduction);
             hbox.setPadding(new Insets(10, 10, 10, 50));
             generationTA.setPrefRowCount(4);
             generationTA.setPadding(new Insets(0, 3, 0, 3));
@@ -143,7 +157,8 @@ public class MainApplication extends Application implements NewGenerationScoredL
             gc.genNextGeneration();
         }
         if( gc.getLatestGenerationNumber() >= GeneticRobotProperties.getNumberOfGenerations()) {
-            startButton.setText("start");
+            propsButtonReproduction.setDisable(false);
+            startButtonReproduction.setText("start");
         }
     }
 

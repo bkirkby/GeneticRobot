@@ -19,24 +19,6 @@ public class GeneticRobotProperties {
 
     private static Properties props;
 
-    private static void initProps() {
-        if( props == null)  {
-            props = new Properties();
-            try {
-                FileInputStream fis = new FileInputStream("default.properties");
-                props.load( fis);
-                fis.close();
-            } catch( FileNotFoundException fnfe) {
-                fnfe.printStackTrace();
-            } catch( IOException ioe) {
-                ioe.printStackTrace();
-            }
-            for( String s : props.stringPropertyNames()) {
-                System.out.println( s);
-            }
-        }
-    }
-
     public static int getNumberOfGenerations() {
         return NUMBER_OF_GENERATIONS;
     }
@@ -71,6 +53,48 @@ public class GeneticRobotProperties {
 
     public static double getCanDisperseFactor() {
         return CAN_DISPERSE_FACTOR;
+    }
+
+    public static void setNumMapsForFitnessFunction(int numMapsForFitnessFunction) {
+        NUM_MAPS_FOR_FITNESS_FUNCTION = numMapsForFitnessFunction;
+    }
+
+    public static void setElitePopulationFactor(double elitePopulationFactor) {
+        ELITE_POPULATION_FACTOR = elitePopulationFactor;
+    }
+
+    public static void setBreederPopulationFactor(double breederPopulationFactor) {
+        BREEDER_POPULATION_FACTOR = breederPopulationFactor;
+    }
+
+    public static void setBreederPopulationSize(int breederPopulationSize) {
+        BREEDER_POPULATION_SIZE = breederPopulationSize;
+    }
+
+    public static void setMapSize(int mapSize) {
+        MAP_SIZE = mapSize;
+    }
+
+    public static void setCanDisperseFactor(double canDisperseFactor) {
+        CAN_DISPERSE_FACTOR = canDisperseFactor;
+    }
+
+    public static void initProps() {
+        if( props == null)  {
+            props = new Properties();
+            try {
+                FileInputStream fis = new FileInputStream("default.properties");
+                props.load( fis);
+                fis.close();
+            } catch( FileNotFoundException fnfe) {
+                fnfe.printStackTrace();
+            } catch( IOException ioe) {
+                ioe.printStackTrace();
+            }
+            for( String s : props.stringPropertyNames()) {
+                System.out.println( s);
+            }
+        }
     }
 
 }
