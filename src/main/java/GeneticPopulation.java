@@ -1,3 +1,5 @@
+import javafx.collections.ObservableArray;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
@@ -45,36 +47,37 @@ public class GeneticPopulation {
                 }
             }
             task.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED,
-                    new EventHandler<WorkerStateEvent>() {
-                        @Override
-                        public void handle(WorkerStateEvent t) {
-                            ArrayList<Score> populationScores = task.getValue();
-                            generationHistory.add(new Strategy(populationScores.get(0).score, population[populationScores.get(0).popIdx]));
+                new EventHandler<WorkerStateEvent>() {
+                    @Override
+                    public void handle(WorkerStateEvent t) {
+                        ArrayList<Score> populationScores = task.getValue();
+                        generationHistory.add(new Strategy(generationHistory.size()+1, populationScores.get(0).score,
+                                population[populationScores.get(0).popIdx]));
 
-                            //now create the breeding ground based on scores
-                            BreedingGround bg = new BreedingGround();
-                            int iBreeders=0;
-                            for(Score s : populationScores) {
-                                bg.addBreeder( population[s.popIdx]);
-                                if(++iBreeders >= population.length* GeneticRobotProperties.getBreederPopulationFactor()) {
-                                    break;
-                                }
+                        //now create the breeding ground based on scores
+                        BreedingGround bg = new BreedingGround();
+                        int iBreeders=0;
+                        for(Score s : populationScores) {
+                            bg.addBreeder( population[s.popIdx]);
+                            if(++iBreeders >= population.length* GeneticRobotProperties.getBreederPopulationFactor()) {
+                                break;
                             }
-                            //generate the new population by first saving the elite, then breeding
-                            int [][] newPop = new int[GeneticRobotProperties.getBreederPopulationSize()][];
-                            int i;
-                            for(i=0; i<population.length*GeneticRobotProperties.getElitePopulationFactor(); i++) {
-                                newPop[i] = population[populationScores.get(i).popIdx];
-                            }
-                            //fill out the rest of the new population by breeding
-                            for(i=(int)(population.length*GeneticRobotProperties.getElitePopulationFactor()); i<population.length; i++) {
-                                newPop[i]=bg.getNextOfBrood();
-                            }
-                            population = newPop;
-
-                            fireNewGenerationScoredEvent();
                         }
-                    });
+                        //generate the new population by first saving the elite, then breeding
+                        int [][] newPop = new int[GeneticRobotProperties.getBreederPopulationSize()][];
+                        int i;
+                        for(i=0; i<population.length*GeneticRobotProperties.getElitePopulationFactor(); i++) {
+                            newPop[i] = population[populationScores.get(i).popIdx];
+                        }
+                        //fill out the rest of the new population by breeding
+                        for(i=(int)(population.length*GeneticRobotProperties.getElitePopulationFactor()); i<population.length; i++) {
+                            newPop[i]=bg.getNextOfBrood();
+                        }
+                        population = newPop;
+
+                        fireNewGenerationScoredEvent();
+                    }
+                });
         }
     }
 
@@ -116,25 +119,6 @@ public class GeneticPopulation {
     }
 
     static public void main( String[] args) {
-        final GeneticPopulation gc = new GeneticPopulation();
-        gc.addNewGenerationScoredListener(new NewGenerationScoredListener() {
-            @Override
-            public void newGenerationScored() {
-                System.out.println(gc.getLatestGenerationNumber() + "    " + gc.getLatestGeneration().getScore());
-            }
-        });
 
-        //gc.run();
-        for(int i=0; i<1000; i++) {
-            gc.genNextGeneration();
-        }
-
-        int [] bestStrat = gc.getLatestGeneration().getStrategy();
-        for(int i=0; i<bestStrat.length; i++) {
-            System.out.print(bestStrat[i]+",");
-            if( i!=0 && i%60==0){
-                System.out.println();
-            }
-        }
     }
 }

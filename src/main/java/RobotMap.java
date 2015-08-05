@@ -1,14 +1,14 @@
 import javafx.util.Pair;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class RobotMap {
     private char[][] map;
     private static Random RND = new Random(System.currentTimeMillis());
     private Pair<Integer,Integer> robotLoc;
     private int[] robotStrategy;
+    private HashMap<String, Pair<Integer,Integer>> cansLoc = new HashMap<>();
+    private int score =0;
 
     //action key: 0=skip, 1=north, 2=south, 3=east, 4=west, 5=random, 6=pickup
     public RobotMap() {
@@ -18,6 +18,7 @@ public class RobotMap {
             for(int y=0; y<GeneticRobotProperties.getMapSize(); y++) {
                 if(RND.nextDouble()>GeneticRobotProperties.getCanDisperseFactor()) {
                     map[x][y] = 'c';
+                    cansLoc.put(Integer.toString(x) + "-" + Integer.toString(y), new Pair(x, y));
                 } else {
                     map[x][y] = '.';
                 }
@@ -50,12 +51,15 @@ public class RobotMap {
         ret += map[x][y];
         return ret;
     }
-    //returns the score from the action
-    public int stepStrategy() {
+    //returns the action,score from the action
+    public Pair<Integer,Integer> stepStrategy() {
         if( robotStrategy == null) {
-            return 0;
+            return null;
         }
-        return performAction(robotStrategy[Scenarios.getSceneIdx(getCurrentScene())]);
+        int s=performAction(robotStrategy[Scenarios.getSceneIdx(getCurrentScene())]);
+        score+=s;
+        return new Pair<Integer,Integer>(robotStrategy[Scenarios.getSceneIdx(getCurrentScene())],
+            s);
     }
     public void setRobotStrategy( int[] strategy) {
         this.robotStrategy = strategy;
@@ -64,14 +68,20 @@ public class RobotMap {
         if( robotStrategy == null) {
             return 0;
         }
-        int score = 0;
+        score = 0;
         for( int i=0;i<maxSteps;i++) {
-            score += stepStrategy();
+            score += stepStrategy().getValue();
         }
         return score;
     }
     private void setRobotLoc(int x, int y){
         robotLoc=new Pair(x,y);
+    }
+    public Pair<Integer,Integer> getRobotLoc() {
+        return robotLoc;
+    }
+    public Collection<Pair<Integer, Integer>> getCansLoc() {
+        return cansLoc.values();
     }
     //0=skip, 1=north, 2=south, 3=east, 4=west, 5=random, 6=trypick
     private int performAction( int action) {
@@ -84,9 +94,31 @@ public class RobotMap {
             case 2:if(y==GeneticRobotProperties.getMapSize()-1){return -5;}else{setRobotLoc(x,++y);return 0;}
             case 3:if(x==GeneticRobotProperties.getMapSize()-1){return -5;}else{setRobotLoc(++x,y);return 0;}
             case 4:if(x==0){return -5;}else{setRobotLoc(--x,y);return 0;}
-            case 6:if(map[x][y]=='c'){map[x][y]='.';return 10;}else{return -1;}
+            case 6: {
+                if(map[x][y]=='c'){
+                    map[x][y]='.';
+                    cansLoc.remove( Integer.toString(x)+"-"+Integer.toString(y));
+                    return 10;
+                }else{
+                    return -1;
+                }
+            }
             default: return 0;
         }
+    }
+    public static String actionIntToString(int action) {
+        switch(action){
+            case 1: return "north";
+            case 2: return "south";
+            case 3: return "east";
+            case 4: return "west";
+            case 5: return "random";
+            case 6: return "pick";
+            default: return "unknown";
+        }
+    }
+    public int getScore(){
+        return score;
     }
     /*public static void main(String[] args) {
         RobotMap rm = new RobotMap();
