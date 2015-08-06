@@ -14,7 +14,7 @@ public class GeneticRobotProperties {
     private static double BREEDER_POPULATION_FACTOR=.2;
     private static int BREEDER_POPULATION_SIZE=150;
     private static int NUMBER_OF_GENERATIONS=1000;
-    private static int MAP_SIZE=30;
+    private static int MAP_SIZE=10;
     private static double CAN_DISPERSE_FACTOR=.5;
 
     private static Properties props;

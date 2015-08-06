@@ -1,8 +1,9 @@
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
-import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -22,7 +23,7 @@ import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Pair;
 
-import java.util.ArrayList;
+import java.util.*;
 
 
 /**
@@ -43,6 +44,7 @@ public class MainApplication extends Application implements NewGenerationScoredL
     final private Button propsButtonReproduction = new Button("properties");
     final private TableView<Strategy> strategyTableView = new TableView<>();
     private ObservableList<Strategy> topStrategyList;
+    final private HashMap<Pair<Integer,Integer>, Integer> mapCanLocationIndexes = new HashMap<Pair<Integer,Integer>,Integer>();
 
     @Override
     public void start(final Stage stage) throws Exception {
@@ -132,49 +134,51 @@ public class MainApplication extends Application implements NewGenerationScoredL
             //buttons hbox
             HBox hbox = new HBox();
             hbox.setSpacing(10);
-            final Button startBtn = new Button("step");
+            final Button stepBtn = new Button("step");
+            stepBtn.setDisable( true);
+            final Button runBtn = new Button("run");
             final Button resetBtn = new Button("reset");
-            final Label update = new Label("x/0.0");
-            startBtn.setOnAction(new EventHandler<ActionEvent>() {
-                 @Override
-                 public void handle(ActionEvent event) {
-                     if (startBtn.getText() == "step") {
-                         if (rm == null) {
-                             rm = new RobotMap();
-                             rm.setRobotStrategy(strategyTableView.getSelectionModel().getSelectedItem().getStrategy());
-                             seriesRobot.getData().add( new XYChart.Data(rm.getRobotLoc().getKey()+.5 , rm.getRobotLoc().getValue()+.5, .35));
-                             for(Pair<Integer,Integer> canLoc : rm.getCansLoc()) {
-                                 seriesCans.getData().add( new XYChart.Data( canLoc.getKey()+.5, canLoc.getValue()+.5, .2));
-                             }
-                         }
-                         Pair<Integer,Integer> actionAndScore = rm.stepStrategy();
-                         update.setText( RobotMap.actionIntToString(actionAndScore.getKey())+"/"+Double.toString(actionAndScore.getValue())+"/"
-                                 +Integer.toString(rm.getScore()));
-                         seriesRobot.getData().remove(0);
-                         seriesRobot.getData().add(new XYChart.Data(rm.getRobotLoc().getKey() + .5, rm.getRobotLoc().getValue() + .5, .35));
-
-
-                        /*rmw = new RobotMapWorker( rm);
-
-                        //setup map
-                        seriesRobot.getData().add( new XYChart.Data(rmw.getRobotLoc().getKey()+.5 , rmw.getRobotLoc().getValue()+.5, .35));
-                        for(Pair<Integer,Integer> canLoc : rmw.getCansLoc()) {
-                            seriesCans.getData().add( new XYChart.Data( canLoc.getKey()+.5, canLoc.getValue()+.5, .2));
+            final Label update = new Label("x/0/0");
+            stepBtn.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+                    if (stepBtn.getText() == "step") {
+                        if (rm == null) {
+                            mapCreateNew();
                         }
-                        stepRobot();*/
-                     }
-                 }
-             });
+                        Pair<Integer, Integer> actionAndScore = rm.stepStrategy();
+                        update.setText(RobotMap.actionIntToString(actionAndScore.getKey()) + "/" + Double.toString(actionAndScore.getValue()) + "/"
+                                + Integer.toString(rm.getScore()));
+                        Pair<Integer,Integer> robotLoc = rm.getRobotLoc();
+                        //if they got the reward then they must have picked up a can, so let's remove it
+                        if(actionAndScore.getValue()==RobotMap.PICK_SUCCESS_REWARD) {
+                            //remove( Object) below is broken, so i need to rebuild the list and set it to seriesCans
+                            //fwiw, remove(int) and remove(int,int) are also broken
+                            //seriesCans.getData().remove(new XYChart.Data(robotLoc.getKey() + 1.5, robotLoc.getValue() + 1.5, .2));
+                            ArrayList<XYChart.Data> al = new ArrayList();
+                            for( Pair<Integer, Integer> canLoc : rm.getCansLoc()) {
+                                al.add(new XYChart.Data(canLoc.getKey()+1.5,canLoc.getValue()+1.5,.2));
+                            }
+                            seriesCans.setData(FXCollections.observableList(al));
+                        }
+                        mapMoveRobot(robotLoc);
+                    }
+                }
+            });
+            runBtn.setOnAction(new EventHandler<ActionEvent>() {
+                @Override
+                public void handle(ActionEvent event) {
+                    //concurrent service to run
+                }
+            });
             resetBtn.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent event) {
-                    rm = null;
-                    seriesCans.getData().clear();
-                    seriesRobot.getData().clear();
+                    mapCreateNew();
                 }
             });
 
-            hbox.getChildren().addAll(startBtn, resetBtn, update);
+            hbox.getChildren().addAll(stepBtn, resetBtn, update);
             hbox.setPadding(new Insets(10, 10, 10, 200));
             robotMapVBox.getChildren().add(hbox);
 
@@ -190,17 +194,29 @@ public class MainApplication extends Application implements NewGenerationScoredL
             strategyTableView.getColumns().setAll(generationCol, scoreCol);
             strategyTableView.setItems(topStrategyList);
             strategyTableView.setPrefWidth(155);
+            strategyTableView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Strategy>(){
+                @Override
+                public void changed(ObservableValue<? extends Strategy> ov, Strategy oldVal, Strategy newVal) {
+                    if( newVal!= null) {
+                        rm.setRobotStrategy( newVal.getStrategy());
+                        stepBtn.setDisable( false);
+                    } else {
+                        stepBtn.setDisable( true);
+                    }
+                }
+            });
             hbox.getChildren().add(strategyTableView);
             //map
             {
-                final NumberAxis x_axis = new NumberAxis(1, GeneticRobotProperties.getMapSize(), 1);
-                final NumberAxis y_axis = new NumberAxis(1, GeneticRobotProperties.getMapSize(), 1);
+                final NumberAxis x_axis = new NumberAxis(1, GeneticRobotProperties.getMapSize()+1, 1);
+                final NumberAxis y_axis = new NumberAxis(1, GeneticRobotProperties.getMapSize()+1, 1);
                 final BubbleChart<Number, Number> blc = new
                         BubbleChart<Number, Number>(x_axis, y_axis);
                 seriesRobot.setName("robot");
                 seriesCans.setName("cans");
                 blc.getData().addAll(seriesRobot, seriesCans);
                 hbox.getChildren().add(blc);
+                mapCreateNew();
             }
             robotMapVBox.getChildren().add(hbox);
 
@@ -249,33 +265,34 @@ public class MainApplication extends Application implements NewGenerationScoredL
         svc.setOnSucceeded(new RobotMapProgressEventHandler());
 
         svc.start();
-        /*Thread t = new Thread(svc);
-        t.start();
-        while(t.isAlive()) {
-            try {
-                Thread.sleep(10);
-            } catch( InterruptedException e) {
-                break;
-            }
+    }
+
+    private void mapCreateNew() {
+        seriesCans.getData().clear();
+        seriesRobot.getData().clear();
+        rm = new RobotMap();
+        if( strategyTableView.getSelectionModel().getSelectedItem() != null) {
+            rm.setRobotStrategy( strategyTableView.getSelectionModel().getSelectedItem().getStrategy());
         }
-        svc.addEventHandler(WorkerStateEvent.WORKER_STATE_RUNNING,
-                new EventHandler<WorkerStateEvent>() {
-                    @Override
-                    public void handle(WorkerStateEvent event) {
-                        System.out.print('b');
-                    }
-                }
-        );
-        svc.addEventHandler(WorkerStateEvent.WORKER_STATE_SUCCEEDED,
-                new EventHandler<WorkerStateEvent>() {
-                    @Override
-                    public void handle(WorkerStateEvent t) {
-                        System.out.println('c');
-                        //int score = task.getValue();
-                        //rmw.getRobotLoc();
-                    }
-                }
-        );*/
+        //rm.setRobotStrategy( );
+        mapMoveRobot(rm.getRobotLoc());
+        int i=0;
+        for (Pair<Integer, Integer> canLoc : rm.getCansLoc()) {
+            mapCanLocationIndexes.put(canLoc, i++);
+            seriesCans.getData().add(new XYChart.Data(canLoc.getKey() + 1.5, canLoc.getValue() + 1.5, .2));
+        }
+    }
+
+    /*private ObservableList<XYChart.Data> transformMapCanList( List<Pair<Integer,Integer>> cansLoc) {
+        seriesCan.
+        return ol;
+    }*/
+
+    private void mapMoveRobot( Pair<Integer,Integer> xy) {
+        if( seriesRobot.getData().size() > 0) {
+            seriesRobot.getData().remove(0);
+        }
+        seriesRobot.getData().add(new XYChart.Data(xy.getKey() + 1.5, xy.getValue() + 1.5, .35));
     }
 
     public void startReproducing() {
@@ -307,7 +324,7 @@ public class MainApplication extends Application implements NewGenerationScoredL
             seriesGenScore.getData().add(new XYChart.Data(s.getGenerationNumber(), s.getScoreNumber()));
             generationTA.setText(s.getGeneration() + "    " + s.getScore() + "\n" + generationTA.getText());
 
-            topStrategyList.add( s);
+            topStrategyList.add(s);
         }
     }
 
@@ -320,6 +337,8 @@ public class MainApplication extends Application implements NewGenerationScoredL
             stepRobot();
         }
     }
+
+
 
     public static void main(String[] args) {
         launch(args);

@@ -9,6 +9,9 @@ public class RobotMap {
     private int[] robotStrategy;
     private HashMap<String, Pair<Integer,Integer>> cansLoc = new HashMap<>();
     private int score =0;
+    static public int PICK_SUCCESS_REWARD=10;
+    static public int PICK_FAIL_PUNISHMENT=-1;
+    static public int WALL_HIT_PUNISHMENT=-5;
 
     //action key: 0=skip, 1=north, 2=south, 3=east, 4=west, 5=random, 6=pickup
     public RobotMap() {
@@ -56,10 +59,10 @@ public class RobotMap {
         if( robotStrategy == null) {
             return null;
         }
-        int s=performAction(robotStrategy[Scenarios.getSceneIdx(getCurrentScene())]);
+        int action = robotStrategy[Scenarios.getSceneIdx(getCurrentScene())];
+        int s=performAction(action);
         score+=s;
-        return new Pair<Integer,Integer>(robotStrategy[Scenarios.getSceneIdx(getCurrentScene())],
-            s);
+        return new Pair<Integer,Integer>(action, s);
     }
     public void setRobotStrategy( int[] strategy) {
         this.robotStrategy = strategy;
@@ -90,17 +93,22 @@ public class RobotMap {
         //for random move, randomize 1-4 inclusive which are the n,s,e,w movements
         if( action == 5){action = RND.nextInt(4)+1;}
         switch(action) {
-            case 1:if(y==0){return -5;}else{setRobotLoc(x,--y);return 0;}
-            case 2:if(y==GeneticRobotProperties.getMapSize()-1){return -5;}else{setRobotLoc(x,++y);return 0;}
-            case 3:if(x==GeneticRobotProperties.getMapSize()-1){return -5;}else{setRobotLoc(++x,y);return 0;}
-            case 4:if(x==0){return -5;}else{setRobotLoc(--x,y);return 0;}
+            case 1:if(y==0){
+                return WALL_HIT_PUNISHMENT;
+            }else{
+                setRobotLoc(x,--y);
+                return 0;
+            }
+            case 2:if(y==GeneticRobotProperties.getMapSize()-1){return WALL_HIT_PUNISHMENT;}else{setRobotLoc(x,++y);return 0;}
+            case 3:if(x==GeneticRobotProperties.getMapSize()-1){return WALL_HIT_PUNISHMENT;}else{setRobotLoc(++x,y);return 0;}
+            case 4:if(x==0){return WALL_HIT_PUNISHMENT;}else{setRobotLoc(--x,y);return 0;}
             case 6: {
                 if(map[x][y]=='c'){
                     map[x][y]='.';
                     cansLoc.remove( Integer.toString(x)+"-"+Integer.toString(y));
-                    return 10;
+                    return PICK_SUCCESS_REWARD;
                 }else{
-                    return -1;
+                    return PICK_FAIL_PUNISHMENT;
                 }
             }
             default: return 0;
@@ -108,8 +116,11 @@ public class RobotMap {
     }
     public static String actionIntToString(int action) {
         switch(action){
-            case 1: return "north";
-            case 2: return "south";
+            case 0: return "stay";
+            //case 1: return "north"; chnge these now for display purpose
+            //case 2: return "south";
+            case 1: return "south";
+            case 2: return "north";
             case 3: return "east";
             case 4: return "west";
             case 5: return "random";
