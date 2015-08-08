@@ -48,6 +48,7 @@ public class MainApplication extends Application implements NewGenerationScoredL
     final private Button propsButtonReproduction = new Button("properties");
     final private TableView<Strategy> strategyTableView = new TableView<>();
     private ObservableList<Strategy> topStrategyList;
+    static public Stage stage;
 
     @Override
     public void start(final Stage stage) throws Exception {
@@ -109,26 +110,33 @@ public class MainApplication extends Application implements NewGenerationScoredL
 
                 }
             });
-            HBox hbox = new HBox();
-            hbox.setSpacing(10);
-            hbox.getChildren().addAll(startButtonReproduction, propsButtonReproduction);
-            hbox.setPadding(new Insets(10, 10, 10, 50));
+
+            HBox hboxBtns = new HBox();
+            hboxBtns.setSpacing(10);
+            hboxBtns.setPadding(new Insets(10, 10, 10, 50));
+            hboxBtns.getChildren().addAll(startButtonReproduction, propsButtonReproduction);
+
+            PropertiesHBox hboxProps = new PropertiesHBox();
+            GeneticRobotProperties props = GeneticRobotProperties.addPropertyChangeListener(hboxProps);
+            hboxProps.setProperties( props);
+
+            HBox hboxMain = new HBox();
+            hboxMain.getChildren().addAll(lineChart, generationTA);
+            hboxMain.setPrefHeight(450);
+            hboxMain.setPrefWidth(800);
             generationTA.setPrefRowCount(4);
             generationTA.setPadding(new Insets(0, 3, 0, 3));
             generationTA.setPrefWidth(150);
             generationTA.setMaxWidth(150);
             generationTA.setPrefHeight(450);
 
-            HBox h = new HBox();
-            h.getChildren().addAll(lineChart, generationTA);
-            h.setPrefHeight(450);
-            h.setPrefWidth(800);
+            reproductionVbox.getChildren().addAll(hboxBtns, hboxProps, hboxMain);
 
-            reproductionVbox.getChildren().addAll(hbox, h);
             Tab genTab = new Tab();
             genTab.setText("reproduce");
             genTab.setContent(reproductionVbox);
             tabPane.getTabs().add(genTab);
+            MainApplication.stage = stage;
         }
 
         //setup the robot map tab
@@ -213,9 +221,9 @@ public class MainApplication extends Application implements NewGenerationScoredL
             hbox.getChildren().add(strategyTableView);
             //map
             {
-                final NumberAxis x_axis = new NumberAxis(1, GeneticRobotProperties.getMapSize()+1, 1);
+                final NumberAxis x_axis = new NumberAxis(1, GeneticRobotProperties.getProps().getMapSize()+1, 1);
                 x_axis.getStyleClass().addAll("map-axis");
-                final NumberAxis y_axis = new NumberAxis(1, GeneticRobotProperties.getMapSize()+1, 1);
+                final NumberAxis y_axis = new NumberAxis(1, GeneticRobotProperties.getProps().getMapSize()+1, 1);
                 y_axis.getStyleClass().addAll("map-axis");
                 final BubbleChart<Number, Number> blc = new
                         BubbleChart<Number, Number>(x_axis, y_axis);
@@ -245,18 +253,14 @@ public class MainApplication extends Application implements NewGenerationScoredL
 
         stage.setScene(scene);
         stage.show();
-
-        //this has to be here cause it's a hac to get the background color of the textarea changed
-        Region reg = (Region)generationTA.lookup(".content");
-        reg.setStyle("-fx-background-color: black;");
     }
 
     @Override
     public void newGenerationScored() {
-        if( gc.getLatestGenerationNumber() < GeneticRobotProperties.getNumberOfGenerations() && !stopped && !paused) {
+        if( gc.getLatestGenerationNumber() < GeneticRobotProperties.getProps().getNumberOfGenerations() && !stopped && !paused) {
             gc.genNextGeneration();
         }
-        if( gc.getLatestGenerationNumber() >= GeneticRobotProperties.getNumberOfGenerations()) {
+        if( gc.getLatestGenerationNumber() >= GeneticRobotProperties.getProps().getNumberOfGenerations()) {
             propsButtonReproduction.setDisable(false);
             startButtonReproduction.setText("start");
         }

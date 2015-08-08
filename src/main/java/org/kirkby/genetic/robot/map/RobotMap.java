@@ -19,11 +19,11 @@ public class RobotMap {
 
     //action key: 0=skip, 1=north, 2=south, 3=east, 4=west, 5=random, 6=pickup
     public RobotMap() {
-        robotLoc = new Pair(RND.nextInt(GeneticRobotProperties.getMapSize()),RND.nextInt(GeneticRobotProperties.getMapSize()));
-        map = new char[GeneticRobotProperties.getMapSize()][GeneticRobotProperties.getMapSize()];
-        for(int x=0; x<GeneticRobotProperties.getMapSize(); x++) {
-            for(int y=0; y<GeneticRobotProperties.getMapSize(); y++) {
-                if(RND.nextDouble()<=GeneticRobotProperties.getCanDisperseFactor()) {
+        robotLoc = new Pair(RND.nextInt(GeneticRobotProperties.getProps().getMapSize()),RND.nextInt(GeneticRobotProperties.getProps().getMapSize()));
+        map = new char[GeneticRobotProperties.getProps().getMapSize()][GeneticRobotProperties.getProps().getMapSize()];
+        for(int x=0; x<GeneticRobotProperties.getProps().getMapSize(); x++) {
+            for(int y=0; y<GeneticRobotProperties.getProps().getMapSize(); y++) {
+                if(RND.nextDouble()<= GeneticRobotProperties.getProps().getCanDisperseFactor()) { //getCanDisperseFactor()) {
                     map[x][y] = 'c';
                     cansLoc.put(Integer.toString(x) + "-" + Integer.toString(y), new Pair(x, y));
                 } else {
@@ -33,9 +33,9 @@ public class RobotMap {
         }
     }
     public void printMap() {
-        for(int y=0; y<GeneticRobotProperties.getMapSize(); y++) {
+        for(int y=0; y<GeneticRobotProperties.getProps().getMapSize(); y++) {
             StringBuffer row = new StringBuffer();
-            for(int x=0; x<GeneticRobotProperties.getMapSize(); x++) {
+            for(int x=0; x<GeneticRobotProperties.getProps().getMapSize(); x++) {
                 row.append(this.map[x][y]);
                 row.append(' ');
             }
@@ -49,11 +49,11 @@ public class RobotMap {
         //west
         ret += (x==0?'w':map[x-1][y]);
         //east
-        ret += (x==GeneticRobotProperties.getMapSize()-1?'w':map[x+1][y]);
+        ret += (x==GeneticRobotProperties.getProps().getMapSize()-1?'w':map[x+1][y]);
         //north
         ret += (y==0?'w':map[x][y-1]);
         //south
-        ret += (y==GeneticRobotProperties.getMapSize()-1?'w':map[x][y+1]);
+        ret += (y==GeneticRobotProperties.getProps().getMapSize()-1?'w':map[x][y+1]);
         //current
         ret += map[x][y];
         return ret;
@@ -103,8 +103,8 @@ public class RobotMap {
                 setRobotLoc(x,--y);
                 return 0;
             }
-            case 2:if(y==GeneticRobotProperties.getMapSize()-1){return WALL_HIT_PUNISHMENT;}else{setRobotLoc(x,++y);return 0;}
-            case 3:if(x==GeneticRobotProperties.getMapSize()-1){return WALL_HIT_PUNISHMENT;}else{setRobotLoc(++x,y);return 0;}
+            case 2:if(y==GeneticRobotProperties.getProps().getMapSize()-1){return WALL_HIT_PUNISHMENT;}else{setRobotLoc(x,++y);return 0;}
+            case 3:if(x==GeneticRobotProperties.getProps().getMapSize()-1){return WALL_HIT_PUNISHMENT;}else{setRobotLoc(++x,y);return 0;}
             case 4:if(x==0){return WALL_HIT_PUNISHMENT;}else{setRobotLoc(--x,y);return 0;}
             case 6: {
                 if(map[x][y]=='c'){

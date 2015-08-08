@@ -22,8 +22,8 @@ public class GeneticPopulation {
     }
 
     private void initPopulation() {
-        population = new int[GeneticRobotProperties.getBreederPopulationSize()][Scenarios.getNumberOfScenes()];
-        for(int i=0; i< GeneticRobotProperties.getBreederPopulationSize(); i++) {
+        population = new int[GeneticRobotProperties.getProps().getBreederPopulationSize()][Scenarios.getNumberOfScenes()];
+        for(int i=0; i< GeneticRobotProperties.getProps().getBreederPopulationSize(); i++) {
             for(int j=0; j< Scenarios.getNumberOfScenes(); j++) {
                 population[i][j] = RND.nextInt(ParamActions.getNumberOfActions());
             }
@@ -61,18 +61,18 @@ public class GeneticPopulation {
                         int iBreeders=0;
                         for(Score s : populationScores) {
                             bg.addBreeder( population[s.popIdx]);
-                            if(++iBreeders >= population.length* GeneticRobotProperties.getBreederPopulationFactor()) {
+                            if(++iBreeders >= population.length* GeneticRobotProperties.getProps().getBreederPopulationFactor()) {
                                 break;
                             }
                         }
                         //generate the new population by first saving the elite, then breeding
-                        int [][] newPop = new int[GeneticRobotProperties.getBreederPopulationSize()][];
+                        int [][] newPop = new int[GeneticRobotProperties.getProps().getBreederPopulationSize()][];
                         int i;
-                        for(i=0; i<population.length* GeneticRobotProperties.getElitePopulationFactor(); i++) {
+                        for(i=0; i<population.length* GeneticRobotProperties.getProps().getElitePopulationFactor(); i++) {
                             newPop[i] = population[populationScores.get(i).popIdx];
                         }
                         //fill out the rest of the new population by breeding
-                        for(i=(int)(population.length* GeneticRobotProperties.getElitePopulationFactor()); i<population.length; i++) {
+                        for(i=(int)(population.length* GeneticRobotProperties.getProps().getElitePopulationFactor()); i<population.length; i++) {
                             newPop[i]=bg.getNextOfBrood();
                         }
                         population = newPop;

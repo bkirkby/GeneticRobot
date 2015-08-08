@@ -35,7 +35,7 @@ public class PropertiesDialog extends Application {
         scene.getStylesheets().add("MainApplication.css");
 
         //num-itrs-on-map
-        final TextField tfNumItrsOnMap = new TextField(Integer.toString(GeneticRobotProperties.getNumberOfIterationsOnMap()));
+        final TextField tfNumItrsOnMap = new TextField(Integer.toString(GeneticRobotProperties.getProps().getNumberOfIterationsOnMap()));
         tfNumItrsOnMap.getStyleClass().add("properties-element");
         {
             HBox hb = new HBox();
@@ -48,7 +48,7 @@ public class PropertiesDialog extends Application {
         }
 
         //num-maps-for-fitness-function
-        final TextField tfNumMapsForFitnessFunction = new TextField(Integer.toString(GeneticRobotProperties.getNumMapsForFitnessFunction()));
+        final TextField tfNumMapsForFitnessFunction = new TextField(Integer.toString(GeneticRobotProperties.getProps().getNumMapsForFitnessFunction()));
         tfNumMapsForFitnessFunction.getStyleClass().add("properties-element");
         {
             HBox hb = new HBox();
@@ -61,7 +61,7 @@ public class PropertiesDialog extends Application {
         }
 
         //elite-population-factor=.05
-        final TextField tfElitePopulationFactor = new TextField(Double.toString(GeneticRobotProperties.getElitePopulationFactor()));
+        final TextField tfElitePopulationFactor = new TextField(Double.toString(GeneticRobotProperties.getProps().getElitePopulationFactor()));
         tfElitePopulationFactor.getStyleClass().add("properties-element");
         {
             HBox hb = new HBox();
@@ -74,7 +74,7 @@ public class PropertiesDialog extends Application {
         }
 
         //breeder-population-factor=.2
-        final TextField tfBreederPopFactor = new TextField(Double.toString(GeneticRobotProperties.getBreederPopulationFactor()));
+        final TextField tfBreederPopFactor = new TextField(Double.toString(GeneticRobotProperties.getProps().getBreederPopulationFactor()));
         tfBreederPopFactor.getStyleClass().add("properties-element");
         {
             HBox hb = new HBox();
@@ -87,7 +87,7 @@ public class PropertiesDialog extends Application {
         }
 
         //breeder-population-size=150
-        final TextField tfBreederPopSize = new TextField(Integer.toString(GeneticRobotProperties.getBreederPopulationSize()));
+        final TextField tfBreederPopSize = new TextField(Integer.toString(GeneticRobotProperties.getProps().getBreederPopulationSize()));
         tfBreederPopSize.getStyleClass().add("properties-element");
         {
             HBox hb = new HBox();
@@ -100,7 +100,7 @@ public class PropertiesDialog extends Application {
         }
 
         //number-of-generations=1000
-        final TextField tfNumberOfGenerations = new TextField(Integer.toString(GeneticRobotProperties.getNumberOfGenerations()));
+        final TextField tfNumberOfGenerations = new TextField(Integer.toString(GeneticRobotProperties.getProps().getNumberOfGenerations()));
         tfNumberOfGenerations.getStyleClass().add("properties-element");
         {
             HBox hb = new HBox();
@@ -113,7 +113,7 @@ public class PropertiesDialog extends Application {
         }
 
         //map-size=10
-        final TextField tfMapSize = new TextField(Integer.toString(GeneticRobotProperties.getMapSize()));
+        final TextField tfMapSize = new TextField(Integer.toString(GeneticRobotProperties.getProps().getMapSize()));
         tfMapSize.getStyleClass().add("properties-element");
         {
             HBox hb = new HBox();
@@ -126,7 +126,7 @@ public class PropertiesDialog extends Application {
         }
 
         //can-disperse-factor=.5
-        final TextField tfCanDisperseFactor = new TextField(Double.toString(GeneticRobotProperties.getCanDisperseFactor()));
+        final TextField tfCanDisperseFactor = new TextField(Double.toString(GeneticRobotProperties.getProps().getCanDisperseFactor()));
         tfCanDisperseFactor.getStyleClass().add("properties-element");
         {
             HBox hb = new HBox();
@@ -147,14 +147,14 @@ public class PropertiesDialog extends Application {
             @Override
             public void handle(javafx.event.ActionEvent event) {
                 try {
-                    GeneticRobotProperties.setNumberOfIterationsOnMap(Integer.parseInt(tfNumItrsOnMap.getText()));
-                    GeneticRobotProperties.setNumMapsForFitnessFunction(Integer.parseInt(tfNumMapsForFitnessFunction.getText()));
-                    GeneticRobotProperties.setElitePopulationFactor(Double.parseDouble(tfElitePopulationFactor.getText()));
-                    GeneticRobotProperties.setBreederPopulationFactor(Double.parseDouble(tfBreederPopFactor.getText()));
-                    GeneticRobotProperties.setBreederPopulationSize(Integer.parseInt(tfBreederPopSize.getText()));
-                    GeneticRobotProperties.setNumberOfGenerations(Integer.parseInt(tfNumberOfGenerations.getText()));
-                    GeneticRobotProperties.setMapSize(Integer.parseInt(tfMapSize.getText()));
-                    GeneticRobotProperties.setCanDisperseFactor(Double.parseDouble(tfCanDisperseFactor.getText()));
+                    GeneticRobotProperties.getProps().setNumberOfIterationsOnMap(Integer.parseInt(tfNumItrsOnMap.getText()));
+                    GeneticRobotProperties.getProps().setNumMapsForFitnessFunction(Integer.parseInt(tfNumMapsForFitnessFunction.getText()));
+                    GeneticRobotProperties.getProps().setElitePopulationFactor(Double.parseDouble(tfElitePopulationFactor.getText()));
+                    GeneticRobotProperties.getProps().setBreederPopulationFactor(Double.parseDouble(tfBreederPopFactor.getText()));
+                    GeneticRobotProperties.getProps().setBreederPopulationSize(Integer.parseInt(tfBreederPopSize.getText()));
+                    GeneticRobotProperties.getProps().setNumberOfGenerations(Integer.parseInt(tfNumberOfGenerations.getText()));
+                    GeneticRobotProperties.getProps().setMapSize(Integer.parseInt(tfMapSize.getText()));
+                    GeneticRobotProperties.getProps().setCanDisperseFactor(Double.parseDouble(tfCanDisperseFactor.getText()));
                     primaryStage.setOpacity(1);
                 }catch(NumberFormatException nfe) {
                     Alert a = new Alert(Alert.AlertType.ERROR, "NumberFormatException "+nfe.getMessage());

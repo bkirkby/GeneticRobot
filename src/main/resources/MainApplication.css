@@ -12,15 +12,15 @@
 }
 
 .text-area {
-  -fx-text-fill: #00ff00;
+  -fx-text-fill: #10ff10;
   -fx-font-family: Verdana;
   -fx-font-size: 10;
+  -fx-font-style: italic;
   -fx-font-weight: bold;
-  -fx-background-color: #b9b9b9;
 }
 
 .text-area .content {
-  -fx-background-color: #bfbfbf;
+  -fx-background-color: #6f6f6f;
 }
 
 .properties-element {
@@ -47,21 +47,19 @@
   -fx-background-color: rgb(255,0,0,.9);
 }
 
-/*.chart-content {
-  -fx-background-color: black;
+.prop-field {
+  -fx-background-color: #e1e1e1;
+  -fx-font-family: Verdana;
+  -fx-font-size: 10;
+  -fx-font-weight: bold;
+  -fx-border-style: solid;
+  -fx-border-width: 0 1 0 1;
+  -fx-text-alignment: center;
+  -fx-text-fill: #b1b1b1;
+  -fx-pref-width: 60px;
 }
 
-.chart-title {
-  -fx-text-fill: #4682b4;
-  -fx-font-size: 1.6em;
+.prop-field-edit {
+  -fx-background-color: #b1b1b1;
+  -fx-text-fill: #515151;
 }
-
-.axis-label {
-  -fx-text-fill: #4682b4;
-}*/
-
-/* http://docs.oracle.com/javase/8/javafx/user-interface-tutorial/css-styles.htm#CIHGIAGE */
-/*.chart-line {
-  border-style: solid;
-  border: 1px 1px 1px 1px;
-}*/

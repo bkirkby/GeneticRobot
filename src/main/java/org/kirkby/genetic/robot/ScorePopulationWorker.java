@@ -26,12 +26,12 @@ public class ScorePopulationWorker extends Task<ArrayList<GeneticPopulation.Scor
         return ret;
     }
     private double fitnessFunction( int[] strategy) {
-        List<RobotMap> testRobotMaps = generateMaps( GeneticRobotProperties.getNumMapsForFitnessFunction());
+        List<RobotMap> testRobotMaps = generateMaps( GeneticRobotProperties.getProps().getNumMapsForFitnessFunction());
         double ret = 0;
 
         for( RobotMap rm : testRobotMaps) {
             rm.setRobotStrategy(strategy);
-            ret += rm.scoreStrategy( GeneticRobotProperties.getNumberOfIterationsOnMap());
+            ret += rm.scoreStrategy( GeneticRobotProperties.getProps().getNumberOfIterationsOnMap());
         }
         return ret/testRobotMaps.size();
     }

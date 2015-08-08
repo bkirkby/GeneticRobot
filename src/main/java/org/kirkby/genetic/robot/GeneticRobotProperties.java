@@ -1,8 +1,7 @@
 package org.kirkby.genetic.robot;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
+import java.util.ArrayList;
 import java.util.Properties;
 
 /**
@@ -10,92 +9,135 @@ import java.util.Properties;
  */
 //https://docs.oracle.com/javase/tutorial/essential/environment/properties.html
 public class GeneticRobotProperties {
-    private static int NUM_ITRS_ON_MAP=75;
-    private static int NUM_MAPS_FOR_FITNESS_FUNCTION=20;
-    private static double ELITE_POPULATION_FACTOR=.05;
-    private static double BREEDER_POPULATION_FACTOR=.2;
-    private static int BREEDER_POPULATION_SIZE=150;
-    private static int NUMBER_OF_GENERATIONS=1000;
-    private static int MAP_SIZE=10;
-    private static double CAN_DISPERSE_FACTOR=.5;
+    private Integer NUM_ITRS_ON_MAP;
+    private Integer NUM_MAPS_FOR_FITNESS_FUNCTION;
+    private double ELITE_POPULATION_FACTOR;
+    private double BREEDER_POPULATION_FACTOR;
+    private Integer BREEDER_POPULATION_SIZE;
+    private Integer NUMBER_OF_GENERATIONS;
+    private Integer MAP_SIZE;
+    private Double CAN_DISPERSE_FACTOR;
 
-    private static Properties props;
+    private static GeneticRobotProperties props;
+    private static ArrayList<PropertiesChangedListener> propertyChangeListeners = new ArrayList<>();
 
-    public static int getNumberOfGenerations() {
+    public static GeneticRobotProperties addPropertyChangeListener( PropertiesChangedListener l) {
+        propertyChangeListeners.add( l);
+        return getProps();
+    }
+
+    public static void firePropertyChanged() {
+        for( PropertiesChangedListener pcl : propertyChangeListeners) {
+            pcl.propertiesChanged( getProps());
+        }
+    }
+
+    public static GeneticRobotProperties getProps(){
+        if( props == null) {
+            props = new GeneticRobotProperties();
+        }
+        return props;
+    }
+
+    private GeneticRobotProperties() {
+        initProps();
+    }
+
+    public Integer getNumberOfGenerations() {
         return NUMBER_OF_GENERATIONS;
     }
-    public static void setNumberOfGenerations(int g) {
+    public  void setNumberOfGenerations(Integer g) {
         NUMBER_OF_GENERATIONS=g;
+        firePropertyChanged();
     }
-    public static int getNumberOfIterationsOnMap() {
+    public  Integer getNumberOfIterationsOnMap() {
         return NUM_ITRS_ON_MAP;
     }
-    public static void setNumberOfIterationsOnMap(int i) {
+    public  void setNumberOfIterationsOnMap(Integer i) {
         NUM_ITRS_ON_MAP = i;
+        firePropertyChanged();
     }
-    public static double getElitePopulationFactor() {
+    public  double getElitePopulationFactor() {
         return ELITE_POPULATION_FACTOR;
     }
 
-    public static int getNumMapsForFitnessFunction() {
+    public  Integer getNumMapsForFitnessFunction() {
         return NUM_MAPS_FOR_FITNESS_FUNCTION;
     }
 
-    public static double getBreederPopulationFactor() {
+    public  void setNumMapsForFitnessFunction(Integer numMapsForFitnessFunction) {
+        NUM_MAPS_FOR_FITNESS_FUNCTION = numMapsForFitnessFunction;
+        firePropertyChanged();
+    }
+
+    public  double getBreederPopulationFactor() {
         return BREEDER_POPULATION_FACTOR;
     }
 
-    public static int getBreederPopulationSize() {
+    public  void setBreederPopulationFactor(double breederPopulationFactor) {
+        BREEDER_POPULATION_FACTOR = breederPopulationFactor;
+        firePropertyChanged();
+    }
+
+    public  Integer getBreederPopulationSize() {
         return BREEDER_POPULATION_SIZE;
     }
 
-    public static int getMapSize() {
+    public  void setBreederPopulationSize(Integer breederPopulationSize) {
+        BREEDER_POPULATION_SIZE = breederPopulationSize;
+        firePropertyChanged();
+    }
+
+    public  Integer getMapSize() {
         return MAP_SIZE;
     }
 
-    public static double getCanDisperseFactor() {
+    public  void setMapSize(Integer mapSize) {
+        MAP_SIZE = mapSize;
+        firePropertyChanged();
+    }
+
+    public  Double getCanDisperseFactor() {
         return CAN_DISPERSE_FACTOR;
     }
 
-    public static void setNumMapsForFitnessFunction(int numMapsForFitnessFunction) {
-        NUM_MAPS_FOR_FITNESS_FUNCTION = numMapsForFitnessFunction;
+    public  void setCanDisperseFactor(Double canDisperseFactor) {
+        CAN_DISPERSE_FACTOR = canDisperseFactor;
+        firePropertyChanged();
     }
 
-    public static void setElitePopulationFactor(double elitePopulationFactor) {
+    public  void setElitePopulationFactor(double elitePopulationFactor) {
         ELITE_POPULATION_FACTOR = elitePopulationFactor;
     }
 
-    public static void setBreederPopulationFactor(double breederPopulationFactor) {
-        BREEDER_POPULATION_FACTOR = breederPopulationFactor;
-    }
-
-    public static void setBreederPopulationSize(int breederPopulationSize) {
-        BREEDER_POPULATION_SIZE = breederPopulationSize;
-    }
-
-    public static void setMapSize(int mapSize) {
-        MAP_SIZE = mapSize;
-    }
-
-    public static void setCanDisperseFactor(double canDisperseFactor) {
-        CAN_DISPERSE_FACTOR = canDisperseFactor;
-    }
-
-    public static void initProps() {
-        if( props == null)  {
-            props = new Properties();
-            try {
-                FileInputStream fis = new FileInputStream("org/kirkby/genetic/robot/default.properties");
-                props.load( fis);
-                fis.close();
-            } catch( FileNotFoundException fnfe) {
-                fnfe.printStackTrace();
-            } catch( IOException ioe) {
-                ioe.printStackTrace();
+    private void initProps() {
+        Properties props=new Properties();
+        try {
+            InputStream is = this.getClass().getResourceAsStream("/default.properties");
+            props.load(is);
+            is.close();
+            for( Object o : props.keySet()) {
+                String name = (String)o;
+                if( name.compareTo("num-itrs-on-map")==0) {
+                    this.setNumberOfIterationsOnMap( Integer.parseInt((String) props.get(o)));
+                } else if(name.compareTo("num-maps-for-fitness-function")==0) {
+                    this.setNumMapsForFitnessFunction(Integer.parseInt((String) props.get(o)));
+                } else if(name.compareTo("elite-population-factor")==0) {
+                    this.setElitePopulationFactor(Double.parseDouble((String) props.get(o)));
+                } else if(name.compareTo("breeder-population-factor")==0) {
+                    this.setBreederPopulationFactor(Double.parseDouble((String) props.get(o)));
+                } else if(name.compareTo("breeder-population-size")==0) {
+                    this.setBreederPopulationSize(Integer.parseInt((String) props.get(o)));
+                } else if(name.compareTo("number-of-generations")==0) {
+                    this.setNumberOfGenerations(Integer.parseInt((String) props.get(o)));
+                } else if(name.compareTo("map-size")==0) {
+                    this.setMapSize( Integer.parseInt((String)props.get(o)));
+                } else if(name.compareTo("can-disperse-factor")==0) {
+                    this.setCanDisperseFactor(Double.parseDouble((String) props.get(o)));
+                }
             }
-            for( String s : props.stringPropertyNames()) {
-                System.out.println( s);
-            }
+        } catch( IOException ioe) {
+            ioe.printStackTrace();
         }
     }
 
