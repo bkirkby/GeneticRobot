@@ -1,8 +1,10 @@
-import javafx.collections.ObservableArray;
-import javafx.collections.ObservableList;
+package org.kirkby.genetic.robot.org.kirkby.genetic.robot.ga;
+
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
+import org.kirkby.genetic.robot.*;
+import org.kirkby.genetic.robot.org.kirkby.genetic.robot.map.ParamActions;
 
 import java.util.*;
 
@@ -22,7 +24,7 @@ public class GeneticPopulation {
     private void initPopulation() {
         population = new int[GeneticRobotProperties.getBreederPopulationSize()][Scenarios.getNumberOfScenes()];
         for(int i=0; i< GeneticRobotProperties.getBreederPopulationSize(); i++) {
-            for(int j=0; j<Scenarios.getNumberOfScenes(); j++) {
+            for(int j=0; j< Scenarios.getNumberOfScenes(); j++) {
                 population[i][j] = RND.nextInt(ParamActions.getNumberOfActions());
             }
         }
@@ -66,11 +68,11 @@ public class GeneticPopulation {
                         //generate the new population by first saving the elite, then breeding
                         int [][] newPop = new int[GeneticRobotProperties.getBreederPopulationSize()][];
                         int i;
-                        for(i=0; i<population.length*GeneticRobotProperties.getElitePopulationFactor(); i++) {
+                        for(i=0; i<population.length* GeneticRobotProperties.getElitePopulationFactor(); i++) {
                             newPop[i] = population[populationScores.get(i).popIdx];
                         }
                         //fill out the rest of the new population by breeding
-                        for(i=(int)(population.length*GeneticRobotProperties.getElitePopulationFactor()); i<population.length; i++) {
+                        for(i=(int)(population.length* GeneticRobotProperties.getElitePopulationFactor()); i<population.length; i++) {
                             newPop[i]=bg.getNextOfBrood();
                         }
                         population = newPop;

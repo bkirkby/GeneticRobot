@@ -1,3 +1,5 @@
+package org.kirkby.genetic.robot;
+
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -22,6 +24,9 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Pair;
+import org.kirkby.genetic.robot.org.kirkby.genetic.robot.ga.GeneticPopulation;
+import org.kirkby.genetic.robot.org.kirkby.genetic.robot.map.RobotMap;
+import org.kirkby.genetic.robot.org.kirkby.genetic.robot.map.RobotMapWorker;
 
 import java.util.*;
 
@@ -36,7 +41,6 @@ public class MainApplication extends Application implements NewGenerationScoredL
     private XYChart.Series seriesGenScore = new XYChart.Series();
     private XYChart.Series seriesRobot = new XYChart.Series();
     private XYChart.Series seriesCans = new XYChart.Series();
-    //private static int NUM_GENERATIONS = GeneticRobotProperties.getNumberOfGenerations();
     TextArea generationTA = new TextArea();
     private boolean paused = false;
     private boolean stopped = false;
@@ -44,7 +48,6 @@ public class MainApplication extends Application implements NewGenerationScoredL
     final private Button propsButtonReproduction = new Button("properties");
     final private TableView<Strategy> strategyTableView = new TableView<>();
     private ObservableList<Strategy> topStrategyList;
-    final private HashMap<Pair<Integer,Integer>, Integer> mapCanLocationIndexes = new HashMap<Pair<Integer,Integer>,Integer>();
 
     @Override
     public void start(final Stage stage) throws Exception {
@@ -52,8 +55,8 @@ public class MainApplication extends Application implements NewGenerationScoredL
         //defining the axes
         final NumberAxis xAxis = new NumberAxis();
         final NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("generation");
-        yAxis.setLabel("avg score");
+        xAxis.setLabel("gen");
+        yAxis.setLabel("score");
         //creating the chart
         final LineChart<Number,Number> lineChart =
                 new LineChart<Number,Number>(xAxis,yAxis);
@@ -151,7 +154,7 @@ public class MainApplication extends Application implements NewGenerationScoredL
                                 + Integer.toString(rm.getScore()));
                         Pair<Integer,Integer> robotLoc = rm.getRobotLoc();
                         //if they got the reward then they must have picked up a can, so let's remove it
-                        if(actionAndScore.getValue()==RobotMap.PICK_SUCCESS_REWARD) {
+                        if(actionAndScore.getValue()== RobotMap.PICK_SUCCESS_REWARD) {
                             //remove( Object) below is broken, so i need to rebuild the list and set it to seriesCans
                             //fwiw, remove(int) and remove(int,int) are also broken
                             //seriesCans.getData().remove(new XYChart.Data(robotLoc.getKey() + 1.5, robotLoc.getValue() + 1.5, .2));
@@ -187,10 +190,12 @@ public class MainApplication extends Application implements NewGenerationScoredL
             hbox.setSpacing(10);
             //list
             topStrategyList = FXCollections.observableList(new ArrayList<Strategy>());
-            TableColumn<Strategy,String> generationCol = new TableColumn<Strategy,String>("generation");
+            TableColumn<Strategy,String> generationCol = new TableColumn<Strategy,String>("gen");
             generationCol.setCellValueFactory(new PropertyValueFactory<Strategy, String>("generation"));
+            generationCol.setPrefWidth(75);
             TableColumn<Strategy,String> scoreCol = new TableColumn<Strategy,String>("score");
             scoreCol.setCellValueFactory(new PropertyValueFactory("score"));
+            scoreCol.setPrefWidth(75);
             strategyTableView.getColumns().setAll(generationCol, scoreCol);
             strategyTableView.setItems(topStrategyList);
             strategyTableView.setPrefWidth(155);
@@ -209,7 +214,9 @@ public class MainApplication extends Application implements NewGenerationScoredL
             //map
             {
                 final NumberAxis x_axis = new NumberAxis(1, GeneticRobotProperties.getMapSize()+1, 1);
+                x_axis.getStyleClass().addAll("map-axis");
                 final NumberAxis y_axis = new NumberAxis(1, GeneticRobotProperties.getMapSize()+1, 1);
+                y_axis.getStyleClass().addAll("map-axis");
                 final BubbleChart<Number, Number> blc = new
                         BubbleChart<Number, Number>(x_axis, y_axis);
                 seriesRobot.setName("robot");
@@ -268,19 +275,17 @@ public class MainApplication extends Application implements NewGenerationScoredL
     }
 
     private void mapCreateNew() {
-        seriesCans.getData().clear();
-        seriesRobot.getData().clear();
         rm = new RobotMap();
         if( strategyTableView.getSelectionModel().getSelectedItem() != null) {
             rm.setRobotStrategy( strategyTableView.getSelectionModel().getSelectedItem().getStrategy());
         }
-        //rm.setRobotStrategy( );
         mapMoveRobot(rm.getRobotLoc());
-        int i=0;
-        for (Pair<Integer, Integer> canLoc : rm.getCansLoc()) {
-            mapCanLocationIndexes.put(canLoc, i++);
-            seriesCans.getData().add(new XYChart.Data(canLoc.getKey() + 1.5, canLoc.getValue() + 1.5, .2));
+        ArrayList<XYChart.Data> al = new ArrayList();
+        for( Pair<Integer, Integer> canLoc : rm.getCansLoc()) {
+            al.add(new XYChart.Data(canLoc.getKey() + 1.5, canLoc.getValue() + 1.5, .2));
         }
+
+        seriesCans.setData(FXCollections.observableList(al));
     }
 
     /*private ObservableList<XYChart.Data> transformMapCanList( List<Pair<Integer,Integer>> cansLoc) {
@@ -324,7 +329,7 @@ public class MainApplication extends Application implements NewGenerationScoredL
             seriesGenScore.getData().add(new XYChart.Data(s.getGenerationNumber(), s.getScoreNumber()));
             generationTA.setText(s.getGeneration() + "    " + s.getScore() + "\n" + generationTA.getText());
 
-            topStrategyList.add(s);
+            topStrategyList.add(0,s);
         }
     }
 

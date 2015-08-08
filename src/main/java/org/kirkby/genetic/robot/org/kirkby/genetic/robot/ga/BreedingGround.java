@@ -1,3 +1,8 @@
+package org.kirkby.genetic.robot.org.kirkby.genetic.robot.ga;
+
+import org.kirkby.genetic.robot.Scenarios;
+import org.kirkby.genetic.robot.org.kirkby.genetic.robot.map.ParamActions;
+
 import java.util.ArrayDeque;
 import java.util.LinkedList;
 import java.util.Random;

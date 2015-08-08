@@ -1,3 +1,5 @@
+package org.kirkby.genetic.robot;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 

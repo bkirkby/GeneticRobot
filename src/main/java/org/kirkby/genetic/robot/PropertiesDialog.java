@@ -1,8 +1,8 @@
+package org.kirkby.genetic.robot;
+
 import javafx.application.Application;
 import javafx.event.EventHandler;
-import javafx.event.EventType;
 import javafx.geometry.Insets;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -13,8 +13,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-
-import java.awt.event.ActionEvent;
 
 /**
  * Created by kirkby on 8/4/15.

@@ -1,4 +1,8 @@
+package org.kirkby.genetic.robot;
+
 import javafx.concurrent.Task;
+import org.kirkby.genetic.robot.org.kirkby.genetic.robot.ga.GeneticPopulation;
+import org.kirkby.genetic.robot.org.kirkby.genetic.robot.map.RobotMap;
 
 import java.util.ArrayList;
 import java.util.Collections;

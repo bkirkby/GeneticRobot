@@ -1,4 +1,8 @@
+package org.kirkby.genetic.robot.org.kirkby.genetic.robot.map;
+
 import javafx.util.Pair;
+import org.kirkby.genetic.robot.GeneticRobotProperties;
+import org.kirkby.genetic.robot.Scenarios;
 
 import java.util.*;
 
@@ -19,7 +23,7 @@ public class RobotMap {
         map = new char[GeneticRobotProperties.getMapSize()][GeneticRobotProperties.getMapSize()];
         for(int x=0; x<GeneticRobotProperties.getMapSize(); x++) {
             for(int y=0; y<GeneticRobotProperties.getMapSize(); y++) {
-                if(RND.nextDouble()>GeneticRobotProperties.getCanDisperseFactor()) {
+                if(RND.nextDouble()<=GeneticRobotProperties.getCanDisperseFactor()) {
                     map[x][y] = 'c';
                     cansLoc.put(Integer.toString(x) + "-" + Integer.toString(y), new Pair(x, y));
                 } else {

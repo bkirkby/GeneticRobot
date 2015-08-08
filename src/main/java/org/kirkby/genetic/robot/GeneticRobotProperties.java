@@ -1,3 +1,5 @@
+package org.kirkby.genetic.robot;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -8,7 +10,7 @@ import java.util.Properties;
  */
 //https://docs.oracle.com/javase/tutorial/essential/environment/properties.html
 public class GeneticRobotProperties {
-    private static int NUM_ITRS_ON_MAP=200;
+    private static int NUM_ITRS_ON_MAP=75;
     private static int NUM_MAPS_FOR_FITNESS_FUNCTION=20;
     private static double ELITE_POPULATION_FACTOR=.05;
     private static double BREEDER_POPULATION_FACTOR=.2;
