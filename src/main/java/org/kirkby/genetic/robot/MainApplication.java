@@ -24,9 +24,9 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 import javafx.util.Pair;
-import org.kirkby.genetic.robot.org.kirkby.genetic.robot.ga.GeneticPopulation;
-import org.kirkby.genetic.robot.org.kirkby.genetic.robot.map.RobotMap;
-import org.kirkby.genetic.robot.org.kirkby.genetic.robot.map.RobotMapWorker;
+import org.kirkby.genetic.robot.ga.GeneticPopulation;
+import org.kirkby.genetic.robot.map.RobotMap;
+import org.kirkby.genetic.robot.map.RobotMapWorker;
 
 import java.util.*;
 

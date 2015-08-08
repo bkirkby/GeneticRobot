@@ -1,4 +1,4 @@
-package org.kirkby.genetic.robot.org.kirkby.genetic.robot.map;
+package org.kirkby.genetic.robot.map;
 
 public class ParamActions {
     //action key: 0=skip, 1=north, 2=south, 3=east, 4=west, 5=random, 6=pickup

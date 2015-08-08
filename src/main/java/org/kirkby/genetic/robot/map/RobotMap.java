@@ -1,4 +1,4 @@
-package org.kirkby.genetic.robot.org.kirkby.genetic.robot.map;
+package org.kirkby.genetic.robot.map;
 
 import javafx.util.Pair;
 import org.kirkby.genetic.robot.GeneticRobotProperties;

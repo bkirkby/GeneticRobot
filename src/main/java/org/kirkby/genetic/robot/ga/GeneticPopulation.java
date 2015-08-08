@@ -1,10 +1,10 @@
-package org.kirkby.genetic.robot.org.kirkby.genetic.robot.ga;
+package org.kirkby.genetic.robot.ga;
 
 import javafx.concurrent.Task;
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import org.kirkby.genetic.robot.*;
-import org.kirkby.genetic.robot.org.kirkby.genetic.robot.map.ParamActions;
+import org.kirkby.genetic.robot.map.ParamActions;
 
 import java.util.*;
 

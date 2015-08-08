@@ -1,9 +1,8 @@
-package org.kirkby.genetic.robot.org.kirkby.genetic.robot.map;
+package org.kirkby.genetic.robot.map;
 
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.util.Pair;
-import org.kirkby.genetic.robot.org.kirkby.genetic.robot.map.RobotMap;
 
 import java.util.Collection;
 

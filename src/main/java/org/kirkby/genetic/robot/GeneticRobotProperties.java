@@ -85,7 +85,7 @@ public class GeneticRobotProperties {
         if( props == null)  {
             props = new Properties();
             try {
-                FileInputStream fis = new FileInputStream("default.properties");
+                FileInputStream fis = new FileInputStream("org/kirkby/genetic/robot/default.properties");
                 props.load( fis);
                 fis.close();
             } catch( FileNotFoundException fnfe) {
