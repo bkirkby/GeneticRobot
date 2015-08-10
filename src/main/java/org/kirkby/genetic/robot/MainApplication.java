@@ -45,7 +45,6 @@ public class MainApplication extends Application implements NewGenerationScoredL
     private boolean paused = false;
     private boolean stopped = false;
     final private Button startButtonReproduction = new Button("start");
-    final private Button propsButtonReproduction = new Button("properties");
     final private TableView<Strategy> strategyTableView = new TableView<>();
     private ObservableList<Strategy> topStrategyList;
     static public Stage stage;
@@ -56,15 +55,14 @@ public class MainApplication extends Application implements NewGenerationScoredL
         //defining the axes
         final NumberAxis xAxis = new NumberAxis();
         final NumberAxis yAxis = new NumberAxis();
-        xAxis.setLabel("gen");
-        yAxis.setLabel("score");
+        xAxis.setLabel("generation");
+        yAxis.setLabel("avgscore");
         //creating the chart
         final LineChart<Number,Number> lineChart =
                 new LineChart<Number,Number>(xAxis,yAxis);
         lineChart.setCreateSymbols(false);
 
-        lineChart.setTitle("robot strategy performance by generation");
-        //defining a
+        //lineChart.setTitle("robot strategy performance by generation");
         seriesGenScore.setName("genetic brood");
 
         VBox vbox = new VBox();
@@ -84,7 +82,6 @@ public class MainApplication extends Application implements NewGenerationScoredL
                 @Override
                 public void handle(ActionEvent event) {
                     if (startButtonReproduction.getText() == "start") {
-                        propsButtonReproduction.setDisable(true);
                         generationTA.setText("initializing...\n" + generationTA.getText());
                         startReproducing();
                         startButtonReproduction.setText("pause");
@@ -98,23 +95,10 @@ public class MainApplication extends Application implements NewGenerationScoredL
                 }
             });
 
-            propsButtonReproduction.setOnAction(new EventHandler<ActionEvent>() {
-                @Override
-                public void handle(ActionEvent event) {
-                    PropertiesDialog pd = new PropertiesDialog();
-                    try {
-                        pd.start(stage);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-                }
-            });
-
             HBox hboxBtns = new HBox();
             hboxBtns.setSpacing(10);
             hboxBtns.setPadding(new Insets(10, 10, 10, 50));
-            hboxBtns.getChildren().addAll(startButtonReproduction, propsButtonReproduction);
+            hboxBtns.getChildren().addAll(startButtonReproduction);
 
             PropertiesHBox hboxProps = new PropertiesHBox();
             GeneticRobotProperties props = GeneticRobotProperties.addPropertyChangeListener(hboxProps);
@@ -261,7 +245,6 @@ public class MainApplication extends Application implements NewGenerationScoredL
             gc.genNextGeneration();
         }
         if( gc.getLatestGenerationNumber() >= GeneticRobotProperties.getProps().getNumberOfGenerations()) {
-            propsButtonReproduction.setDisable(false);
             startButtonReproduction.setText("start");
         }
     }

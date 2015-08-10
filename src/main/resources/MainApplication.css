@@ -3,8 +3,8 @@
 }
 
 .default-color0.chart-series-line {
-   -fx-stroke: #00ff00;
-   -fx-stroke-width: 2px;
+   -fx-stroke: #f99045;
+   -fx-stroke-width: 1px;
 }
 
 .chart-plot-background {
@@ -12,7 +12,7 @@
 }
 
 .text-area {
-  -fx-text-fill: #10ff10;
+  -fx-text-fill: #f41c00;
   -fx-font-family: Verdana;
   -fx-font-size: 10;
   -fx-font-style: italic;
@@ -20,7 +20,7 @@
 }
 
 .text-area .content {
-  -fx-background-color: #6f6f6f;
+  -fx-background-color: #2e0706;
 }
 
 .properties-element {
@@ -47,6 +47,10 @@
   -fx-background-color: rgb(255,0,0,.9);
 }
 
+/* dark red: a31d15
+  orangish: f99045
+  bright red: f41c00
+  black-red: 2e0706*/
 .prop-field {
   -fx-background-color: #e1e1e1;
   -fx-font-family: Verdana;
@@ -62,4 +66,8 @@
 .prop-field-edit {
   -fx-background-color: #b1b1b1;
   -fx-text-fill: #515151;
+}
+
+.tab-pane {
+  -fx-background-color: black;
 }
